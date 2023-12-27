@@ -15,15 +15,15 @@ The process for adding both push servers is to update `git remotes`. This can be
 within the project's root directory:
 
 ```bash
-git remote add both rad://<RAD_ID>
-git remote set-url --push both rad://<RAD_ID>/<NODE_ID>
+git remote add both rad://REPO_ID
+git remote set-url --push both rad://REPO_ID/NODE_ID
 git remote set-url --add --push both < https://github.com/user/repo.git > OR git remote set-url --add --push both < git@github.com:user/repo.git >
 ```
 
 Where:
-* <RAD_ID>: the rad id of the project (e.g. `z3VYhzZ9Vw4nqceS7Ns5vQbo3mctL`)
-* <NODE_ID> the ID of the current running node (e.g. `z6MkkpTPzcq1ybmjQyQpyre15JUeMvZY6toxoZVpLZ8YarsB`)
-* < https://github.com/user/repo.git > OR < git@github.com:user/repo.git >: the git repo URL
+* RAD_ID: the rad id of the project (e.g. `z3VYhzZ9Vw4nqceS7Ns5vQbo3mctL`)
+* NODE_ID: the ID of the current running node (e.g. `z6MkkpTPzcq1ybmjQyQpyre15JUeMvZY6toxoZVpLZ8YarsB`)
+* https://github.com/user/repo.git OR git@github.com:user/repo.git: the git repo URL
 
 This will end up to this output of the `git remote -v` command:
 
