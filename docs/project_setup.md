@@ -1,9 +1,22 @@
-# Multi forge project setup
+# Project setup for GitHub Actions
 
-The goal of this document is to describe the process of creating a project/repository that will update both Radicle 
-and GitHub for any change.
+The goal of this document is to describe the process of creating a project/repository that will work with GitHub 
+Actions. Any push to the repo should update both Radicle and GitHub for all changes. The GitHub Actions adapter 
+will inform back the broker with any results and also update any patch using comments.
 
 ## Project Setup
+
+### Radicle settings for GitHub Actions
+
+Repository should persist information in order to store the GitHub's username and repository that the actions will run.
+These information should be stored under the `.radicle/github-action.yaml` file within the repo's root directory.
+The content of the file should be:
+
+```yaml
+github_username: user
+github_repo: repo_name
+```
+### Repo setup
 
 The repository/project must be setup in a way that each update on the forge should update **both** GitHub and
 Radicle. This way source code will be hosted in Radicle's network but also GitHub Actions will run within the GitHub.
