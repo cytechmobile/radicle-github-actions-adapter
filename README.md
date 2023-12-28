@@ -23,10 +23,13 @@ The minimum requirement for compiling and running this application are:
 The application uses configuration through Environment Variables. Here is a list with the details and the default
 value for each one of them:
 
-| EnvVar                 | Description                                       | Default Value |
-|------------------------|---------------------------------------------------|---------------|
-| `RAD_HOME`             | Path for radicle home directory.                  | "~/.radicle"  |
+| EnvVar       | Description                      | Default Value |
+|--------------|----------------------------------|---------------|
+| `RAD_HOME`   | Path for radicle home directory. | "~/.radicle"  |
+| `GITHUB_PAT` | Personal access token for GitHub | ""            |
 
+> `GITHUB_PAT` should have at least read access for the repo and the actions.
+ 
 ### Running the application
 
 In order to build the **Radicle GitHub Actions Adapter** execute the provided makefile under project's root directory:

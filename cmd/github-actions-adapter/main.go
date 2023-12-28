@@ -76,7 +76,8 @@ func main() {
 func run(logger *slog.Logger) error {
 	var cfg serve.AppConfig
 	cfg.RadicleHome = gohome.Expand(env.GetString("RAD_HOME", "~/.radicle"))
-	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome)
+	cfg.GitHubPAT = gohome.Expand(env.GetString("GITHUB_PAT", ""))
+	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome, "GitHubPAT length", len(cfg.GitHubPAT))
 
 	var application serve.App
 	application.Config = cfg

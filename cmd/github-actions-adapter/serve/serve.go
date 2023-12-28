@@ -10,6 +10,7 @@ import (
 
 type AppConfig struct {
 	RadicleHome string
+	GitHubPAT   string
 }
 
 type App struct {
