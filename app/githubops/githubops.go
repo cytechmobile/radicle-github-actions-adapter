@@ -6,7 +6,8 @@ const (
 	WorkflowResultSuccess string = "success"
 	WorkflowResultFailure string = "failure"
 
-	WorkflowStatusCompleted string = "completed"
+	WorkflowStatusCompleted  string = "completed"
+	WorkflowStatusInProgress string = "in_progress"
 )
 
 type WorkflowResult struct {

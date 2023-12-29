@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// listYAMLFiles lists all .yaml and .yml files from the given directory.
+// It does not look into subdirectories.
 func (rga *RadicleGitHubActions) listYAMLFiles(directory string) ([]string, error) {
 	var yamlFiles []string
 	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
@@ -16,8 +18,8 @@ func (rga *RadicleGitHubActions) listYAMLFiles(directory string) ([]string, erro
 			return err
 		}
 		if info.IsDir() {
-			rga.logger.Debug("file is not a directory", "path", path)
-			return nil
+			rga.logger.Debug("file is a directory", "path", path)
+			return filepath.SkipDir
 		}
 		if strings.HasSuffix(strings.ToLower(info.Name()), ".yaml") || strings.HasSuffix(strings.ToLower(info.Name()), ".yml") {
 			yamlFiles = append(yamlFiles, path)
@@ -30,6 +32,8 @@ func (rga *RadicleGitHubActions) listYAMLFiles(directory string) ([]string, erro
 	return yamlFiles, nil
 }
 
+// getRadicleGitHubActionsSetup retrieves the GitHub Actions settings of the Radicle project.
+// If no file found it returns an error.
 func (rga *RadicleGitHubActions) getRadicleGitHubActionsSetup(filePath string) (*app.GitHubActionsSettings, error) {
 	gitHubActionsSettings := app.GitHubActionsSettings{}
 	yamlFileContent, err := os.ReadFile(filePath)

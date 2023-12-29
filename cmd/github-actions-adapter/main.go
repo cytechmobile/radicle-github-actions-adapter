@@ -80,7 +80,10 @@ func run(logger *slog.Logger) error {
 	var cfg serve.AppConfig
 	cfg.RadicleHome = gohome.Expand(env.GetString("RAD_HOME", "~/.radicle"))
 	cfg.GitHubPAT = env.GetString("GITHUB_PAT", "")
-	cfg.WorkflowsPollTimoutSecs = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_SECS", 6000)
+	cfg.WorkflowsPollTimoutSecs = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_SECS", 600)
+	if cfg.WorkflowsPollTimoutSecs == 0 {
+		cfg.WorkflowsPollTimoutSecs = 600
+	}
 	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome,
 		"WorkflowsPollTimoutSecs", cfg.WorkflowsPollTimoutSecs, "GitHubPAT length", len(cfg.GitHubPAT))
 

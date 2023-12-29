@@ -16,6 +16,8 @@ func NewGit(logger *slog.Logger) *Git {
 	}
 }
 
+// CloneRepoCommit clones a repo from url to repoPath and checkouts to commitHash.
+// It does not handle removing the created files.
 func (g *Git) CloneRepoCommit(url, commitHash, repoPath string) error {
 	repo, err := git.PlainClone(repoPath, false, &git.CloneOptions{
 		URL:               url,

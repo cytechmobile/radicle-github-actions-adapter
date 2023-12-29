@@ -33,7 +33,8 @@ func NewRadicleGitHubActions(radicleHome string, gitOps gitops.GitOps, githubOps
 	}
 }
 
-func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context, radicleHome, projectID,
+// GetRepoCommitWorkflowSetup returns the GitHub Actions setup if any.
+func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context, projectID,
 	commitHash string) (*app.GitHubActionsSettings, error) {
 	repoPath := ctx.Value(app.RepoClonePath).(string)
 	projectID = strings.Trim(projectID, "rad:")
@@ -60,12 +61,13 @@ func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context,
 	githubActionsYamlFilePaths, err := rga.listYAMLFiles(repoPath + GitHubActionsWorkflowsPath)
 	if err != nil || len(githubActionsYamlFilePaths) == 0 {
 		rga.logger.Warn("no GitHub Actions workflows files found", "reason", err.Error())
-		return githubActionsSetup, nil
+		return nil, nil
 	}
-	rga.logger.Debug(fmt.Sprintf("found GitHub actions yaml files: %+v", githubActionsYamlFilePaths))
+	rga.logger.Debug(fmt.Sprintf("found GitHub actions workflows yaml files: %+v", githubActionsYamlFilePaths))
 	return githubActionsSetup, nil
 }
 
+// GetRepoCommitWorkflows retrieves the repo's workflows results from GitHub.
 func (rga *RadicleGitHubActions) GetRepoCommitWorkflows(ctx context.Context, githubUsername, githubRepo,
 	githubCommit string) ([]app.WorkflowResult, error) {
 	err := rga.github.CheckRepoCommit(ctx, githubUsername, githubRepo, githubCommit)

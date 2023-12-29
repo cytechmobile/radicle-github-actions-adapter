@@ -20,6 +20,8 @@ func NewGitHub(pat string, logger *slog.Logger) *GitHub {
 		client: github.NewClient(nil).WithAuthToken(pat),
 	}
 }
+
+// CheckRepoCommit checks if repo and commit are present from GitHub
 func (gh *GitHub) CheckRepoCommit(ctx context.Context, user, repo, commit string) error {
 	_, _, err := gh.client.Repositories.GetCommit(ctx, user, repo, commit, nil)
 	if err != nil {
@@ -29,10 +31,10 @@ func (gh *GitHub) CheckRepoCommit(ctx context.Context, user, repo, commit string
 	return nil
 }
 
+// GetRepoCommitWorkflows returns all the available workflows of the specified repo and commit.
+// If no workflows exist it does not return any error.
 func (gh *GitHub) GetRepoCommitWorkflows(ctx context.Context, user, repo, commit string) ([]githubops.WorkflowResult, error) {
-	ListOptions := github.ListOptions{
-		PerPage: 0,
-	}
+	ListOptions := github.ListOptions{}
 	var result []githubops.WorkflowResult
 	for {
 		runs, resp, err := gh.client.Actions.ListRepositoryWorkflowRuns(ctx, user, repo,
@@ -44,7 +46,6 @@ func (gh *GitHub) GetRepoCommitWorkflows(ctx context.Context, user, repo, commit
 			gh.logger.Error("failed to get repo commit", "error", err.Error())
 			return nil, err
 		}
-		runs.GetTotalCount()
 
 		for _, run := range runs.WorkflowRuns {
 			result = append(result, githubops.WorkflowResult{

@@ -63,8 +63,8 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		return err
 	}
 
-	repoCommitWorkflowSetup, err := gas.GitHubActions.GetRepoCommitWorkflowSetup(ctx, gas.App.Config.RadicleHome,
-		brokerRequestMessage.Repo, brokerRequestMessage.Commit)
+	repoCommitWorkflowSetup, err := gas.GitHubActions.GetRepoCommitWorkflowSetup(ctx, brokerRequestMessage.Repo,
+		brokerRequestMessage.Commit)
 	if err != nil {
 		gas.App.Logger.Error("could not fetch github workflows setup", "error", err.Error())
 		return err
@@ -73,34 +73,12 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		gas.App.Logger.Error("repo has no github workflows setup")
 		return nil
 	}
-	var workflowsResult []app.WorkflowResult
-	var waitDuration time.Duration
-	for {
-		workflowsCompleted := true
-		workflowsResult, err = gas.GitHubActions.GetRepoCommitWorkflows(ctx, repoCommitWorkflowSetup.GitHubUsername,
-			repoCommitWorkflowSetup.GitHubRepo, brokerRequestMessage.Commit)
-		if err != nil {
-			gas.App.Logger.Error("could not get repo commit workflows", "error", err.Error())
-			return err
-		}
-		for _, workflowResult := range workflowsResult {
-			if workflowResult.Status != githubops.WorkflowStatusCompleted {
-				workflowsCompleted = false
-				break
-			}
-		}
-		if !workflowsCompleted {
-			if waitDuration >= time.Second*time.Duration(gas.App.Config.WorkflowsPollTimoutSecs) {
-				gas.App.Logger.Warn("reached timeout while waiting for workflows to complete")
-				break
-			}
-			time.Sleep(app.WorkflowCheckInterval)
-			waitDuration += app.WorkflowCheckInterval
-			continue
-		}
-		break
-	}
 
+	workflowsResult, err := gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
+	if err != nil {
+		gas.App.Logger.Error("repo has no github workflows setup")
+		return err
+	}
 	resultResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseFinished,
 		Result:   app.BrokerResultSuccess,
@@ -122,4 +100,38 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
+	repoCommitWorkflowSetup *app.GitHubActionsSettings, brokerRequestMessage *broker.RequestMessage) ([]app.
+	WorkflowResult, error) {
+	var workflowsResult []app.WorkflowResult
+	var err error
+	var waitDuration time.Duration
+	for {
+		workflowsCompleted := true
+		workflowsResult, err = gas.GitHubActions.GetRepoCommitWorkflows(ctx, repoCommitWorkflowSetup.GitHubUsername,
+			repoCommitWorkflowSetup.GitHubRepo, brokerRequestMessage.Commit)
+		if err != nil {
+			gas.App.Logger.Error("could not get repo commit workflows", "error", err.Error())
+			return nil, err
+		}
+		for _, workflowResult := range workflowsResult {
+			if workflowResult.Status != githubops.WorkflowStatusCompleted {
+				workflowsCompleted = false
+				break
+			}
+		}
+		if !workflowsCompleted {
+			if waitDuration >= time.Second*time.Duration(gas.App.Config.WorkflowsPollTimoutSecs) {
+				gas.App.Logger.Warn("reached timeout while waiting for workflows to complete")
+				break
+			}
+			time.Sleep(app.WorkflowCheckInterval)
+			waitDuration += app.WorkflowCheckInterval
+			continue
+		}
+		break
+	}
+	return workflowsResult, nil
 }
