@@ -18,8 +18,7 @@ func (rga *RadicleGitHubActions) listYAMLFiles(directory string) ([]string, erro
 			return err
 		}
 		if info.IsDir() {
-			rga.logger.Debug("file is a directory", "path", path)
-			return filepath.SkipDir
+			return nil
 		}
 		if strings.HasSuffix(strings.ToLower(info.Name()), ".yaml") || strings.HasSuffix(strings.ToLower(info.Name()), ".yml") {
 			yamlFiles = append(yamlFiles, path)

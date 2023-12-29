@@ -60,7 +60,7 @@ func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context,
 
 	githubActionsYamlFilePaths, err := rga.listYAMLFiles(repoPath + GitHubActionsWorkflowsPath)
 	if err != nil || len(githubActionsYamlFilePaths) == 0 {
-		rga.logger.Warn("no GitHub Actions workflows files found", "reason", err.Error())
+		rga.logger.Warn("no GitHub Actions workflows files found")
 		return nil, nil
 	}
 	rga.logger.Debug(fmt.Sprintf("found GitHub actions workflows yaml files: %+v", githubActionsYamlFilePaths))
