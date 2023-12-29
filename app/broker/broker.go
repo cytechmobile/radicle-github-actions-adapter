@@ -92,9 +92,15 @@ type Author struct {
 }
 
 type ResponseMessage struct {
-	Response string `json:"response"`
-	RunID    *RunID `json:"run_id,omitempty"`
-	Result   string `json:"result,omitempty"`
+	Response      string            `json:"response"`
+	RunID         *RunID            `json:"run_id,omitempty"`
+	Result        string            `json:"result,omitempty"`
+	ResultDetails []WorkflowDetails `json:"result_details,omitempty"`
+}
+
+type WorkflowDetails struct {
+	WorkflowID     string `json:"workflow_id"`
+	WorkflowResult string `json:"workflow_result"`
 }
 
 type ResponseErrorMessage struct {

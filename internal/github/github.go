@@ -5,6 +5,7 @@ import (
 	"github.com/google/go-github/v57/github"
 	"log/slog"
 	"radicle-github-actions-adapter/app/githubops"
+	"strconv"
 )
 
 type GitHub struct {
@@ -47,7 +48,7 @@ func (gh *GitHub) GetRepoCommitWorkflows(ctx context.Context, user, repo, commit
 
 		for _, run := range runs.WorkflowRuns {
 			result = append(result, githubops.WorkflowResult{
-				WorkflowID: string(run.GetID()),
+				WorkflowID: strconv.Itoa(int(run.GetID())),
 				Status:     run.GetStatus(),
 				Result:     run.GetConclusion(),
 			})

@@ -6,11 +6,14 @@ import (
 	"log/slog"
 	"radicle-github-actions-adapter/app"
 	"radicle-github-actions-adapter/app/broker"
+	"radicle-github-actions-adapter/app/githubops"
+	"time"
 )
 
 type AppConfig struct {
-	RadicleHome string
-	GitHubPAT   string
+	RadicleHome             string
+	GitHubPAT               string
+	WorkflowsPollTimoutSecs uint64
 }
 
 type App struct {
@@ -20,30 +23,32 @@ type App struct {
 
 // GitHubActionsServer is used as a container for the most important dependencies.
 type GitHubActionsServer struct {
-	App    *App
-	Broker broker.Broker
+	App           *App
+	Broker        broker.Broker
+	GitHubActions app.GitHubActions
 }
 
 // NewGitHubActionsServer returns a pointer to a new GitHub Action Server.
-func NewGitHubActionsServer(config *App, broker broker.Broker) *GitHubActionsServer {
+func NewGitHubActionsServer(config *App, broker broker.Broker, GitHubActions app.GitHubActions) *GitHubActionsServer {
 	server := &GitHubActionsServer{
-		App:    config,
-		Broker: broker,
+		App:           config,
+		Broker:        broker,
+		GitHubActions: GitHubActions,
 	}
 	return server
 }
 
 // Serve is responsible for parsing stdin input and check any GitHub Actions status of radicle projects
 // It also manages replies to the broker.
-func (whs *GitHubActionsServer) Serve(ctx context.Context) error {
+func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	eventUUID := ctx.Value(app.EventUUIDKey).(string)
-	whs.App.Logger.Info("serving event", app.EventUUIDKey, eventUUID)
-	brokerRequestMessage, err := whs.Broker.ParseRequestMessage(ctx)
+	gas.App.Logger.Info("serving event", app.EventUUIDKey, eventUUID)
+	brokerRequestMessage, err := gas.Broker.ParseRequestMessage(ctx)
 	if err != nil {
-		whs.App.Logger.Error(err.Error())
+		gas.App.Logger.Error(err.Error())
 		return err
 	}
-	whs.App.Logger.Debug("received message type", "message", fmt.Sprintf("%+v", *brokerRequestMessage))
+	gas.App.Logger.Debug("received message type", "message", fmt.Sprintf("%+v", *brokerRequestMessage))
 
 	jobResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseTriggered,
@@ -51,23 +56,68 @@ func (whs *GitHubActionsServer) Serve(ctx context.Context) error {
 			ID: eventUUID,
 		},
 	}
-	whs.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", jobResponse))
-	err = whs.Broker.ServeResponse(ctx, jobResponse)
+	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", jobResponse))
+	err = gas.Broker.ServeResponse(ctx, jobResponse)
 	if err != nil {
-		whs.App.Logger.Error(err.Error())
+		gas.App.Logger.Error(err.Error())
 		return err
 	}
 
-	// Check GitHub Actions status for repo's commit
+	repoCommitWorkflowSetup, err := gas.GitHubActions.GetRepoCommitWorkflowSetup(ctx, gas.App.Config.RadicleHome,
+		brokerRequestMessage.Repo, brokerRequestMessage.Commit)
+	if err != nil {
+		gas.App.Logger.Error("could not fetch github workflows setup", "error", err.Error())
+		return err
+	}
+	if repoCommitWorkflowSetup == nil {
+		gas.App.Logger.Error("repo has no github workflows setup")
+		return nil
+	}
+	var workflowsResult []app.WorkflowResult
+	var waitDuration time.Duration
+	for {
+		workflowsCompleted := true
+		workflowsResult, err = gas.GitHubActions.GetRepoCommitWorkflows(ctx, repoCommitWorkflowSetup.GitHubUsername,
+			repoCommitWorkflowSetup.GitHubRepo, brokerRequestMessage.Commit)
+		if err != nil {
+			gas.App.Logger.Error("could not get repo commit workflows", "error", err.Error())
+			return err
+		}
+		for _, workflowResult := range workflowsResult {
+			if workflowResult.Status != githubops.WorkflowStatusCompleted {
+				workflowsCompleted = false
+				break
+			}
+		}
+		if !workflowsCompleted {
+			if waitDuration >= time.Second*time.Duration(gas.App.Config.WorkflowsPollTimoutSecs) {
+				gas.App.Logger.Warn("reached timeout while waiting for workflows to complete")
+				break
+			}
+			time.Sleep(app.WorkflowCheckInterval)
+			waitDuration += app.WorkflowCheckInterval
+			continue
+		}
+		break
+	}
 
 	resultResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseFinished,
 		Result:   app.BrokerResultSuccess,
 	}
-	whs.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", resultResponse))
-	err = whs.Broker.ServeResponse(ctx, resultResponse)
+	for _, workflowResult := range workflowsResult {
+		resultResponse.ResultDetails = append(resultResponse.ResultDetails, broker.WorkflowDetails{
+			WorkflowID:     workflowResult.WorkflowID,
+			WorkflowResult: workflowResult.Result,
+		})
+		if workflowResult.Result != githubops.WorkflowResultSuccess {
+			resultResponse.Result = app.BrokerResultFailure
+		}
+	}
+	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", resultResponse))
+	err = gas.Broker.ServeResponse(ctx, resultResponse)
 	if err != nil {
-		whs.App.Logger.Error(err.Error())
+		gas.App.Logger.Error(err.Error())
 		return err
 	}
 

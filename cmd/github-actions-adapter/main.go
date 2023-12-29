@@ -10,6 +10,9 @@ import (
 	"radicle-github-actions-adapter/app"
 	"radicle-github-actions-adapter/app/broker"
 	"radicle-github-actions-adapter/cmd/github-actions-adapter/serve"
+	"radicle-github-actions-adapter/internal/git"
+	"radicle-github-actions-adapter/internal/github"
+	"radicle-github-actions-adapter/internal/radiclegithubactions"
 	"radicle-github-actions-adapter/internal/readerwriterbroker"
 	"radicle-github-actions-adapter/pkg/env"
 	"radicle-github-actions-adapter/pkg/gohome"
@@ -76,16 +79,20 @@ func main() {
 func run(logger *slog.Logger) error {
 	var cfg serve.AppConfig
 	cfg.RadicleHome = gohome.Expand(env.GetString("RAD_HOME", "~/.radicle"))
-	cfg.GitHubPAT = gohome.Expand(env.GetString("GITHUB_PAT", ""))
-	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome, "GitHubPAT length", len(cfg.GitHubPAT))
+	cfg.GitHubPAT = env.GetString("GITHUB_PAT", "")
+	cfg.WorkflowsPollTimoutSecs = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_SECS", 6000)
+	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome,
+		"WorkflowsPollTimoutSecs", cfg.WorkflowsPollTimoutSecs, "GitHubPAT length", len(cfg.GitHubPAT))
 
 	var application serve.App
 	application.Config = cfg
 	application.Logger = logger
 	logger.Info("radicle-github-actions-adapter is starting", "version", version.Get())
 	radicleBroker := readerwriterbroker.NewReaderWriterBroker(os.Stdin, os.Stdout, logger)
-
-	srv := serve.NewGitHubActionsServer(&application, radicleBroker)
+	gitOps := git.NewGit(logger)
+	gitHubOps := github.NewGitHub(cfg.GitHubPAT, logger)
+	gitHubActions := radiclegithubactions.NewRadicleGitHubActions(cfg.RadicleHome, gitOps, gitHubOps, logger)
+	srv := serve.NewGitHubActionsServer(&application, radicleBroker, gitHubActions)
 
 	eventUUID := uuid.New().String()
 	ctx := context.WithValue(context.Background(), app.EventUUIDKey, eventUUID)
