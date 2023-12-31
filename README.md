@@ -67,6 +67,57 @@ Application binary accepts specific arguments at init time. There are:
 | `version`  | ./radicle-github-actions-adapter --version          | Prints only the binary's version and exits                                     | _empty_       |
 | `loglevel` | ./radicle-github-actions-adapter --loglevel debug   | Set the log level of the application.<br/> (`debug`, `info`, `warn`, `error`)  | info          |
 
+
+### Adapter Input - Output
+
+Radicle GitHub Actions Adapter accepts messages and responds to Radicle CI Broker through std IO. The following messages
+are exchanges throughout the adapter's runtime:
+
+1. Incoming _Push Event Request_ or _Patch Event Request_ message as described at
+   `rad:zwTxygwuz5LDGBq255RA2CbNGrz8/tree/doc/architecture.md`
+
+2. Outgoing response message with the job ID:
+
+```json
+{
+    "response": "triggered",
+    "run_id": "<RUN-UUID>"
+}
+```
+3. Outgoing response message with the response result:
+
+```json
+{
+   "response": "finished",
+   "result": "<success|failure>",
+   "result_details": [
+      {
+         "workflow_id": "7369195312",
+         "workflow_name": "Lint source code",
+         "workflow_result": "success"
+      },
+      {
+         "workflow_id": "7369195314",
+         "workflow_name": "Run unit tests",
+         "workflow_result": "failure"
+      }
+   ]
+}
+```
+
+If at least on job fails the result will be considered as failed.
+
+In case of an unexpected error the following response message is provided
+
+```json
+{
+  "response": "finished",
+  "result": {
+    "error": "details of the error occurred"
+  }
+}
+```
+
 ## Contribute
 
 Open an issue for discussing any issue or bug.
