@@ -21,9 +21,10 @@ type GitHubActionsSettings struct {
 }
 
 type WorkflowResult struct {
-	WorkflowID string
-	Status     string
-	Result     string
+	WorkflowID   string
+	WorkflowName string
+	Status       string
+	Result       string
 }
 
 // GitHubActions should be implemented to retrieve the GitHub Actions' outcome

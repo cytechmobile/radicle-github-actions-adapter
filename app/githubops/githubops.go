@@ -11,9 +11,10 @@ const (
 )
 
 type WorkflowResult struct {
-	WorkflowID string
-	Status     string
-	Result     string
+	WorkflowID   string
+	WorkflowName string
+	Status       string
+	Result       string
 }
 
 type GitHubOps interface {

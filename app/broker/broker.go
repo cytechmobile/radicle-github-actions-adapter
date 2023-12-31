@@ -100,6 +100,7 @@ type ResponseMessage struct {
 
 type WorkflowDetails struct {
 	WorkflowID     string `json:"workflow_id"`
+	WorkflowName   string `json:"workflow_name"`
 	WorkflowResult string `json:"workflow_result"`
 }
 

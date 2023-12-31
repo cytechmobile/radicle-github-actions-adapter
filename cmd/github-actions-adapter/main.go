@@ -12,6 +12,7 @@ import (
 	"radicle-github-actions-adapter/cmd/github-actions-adapter/serve"
 	"radicle-github-actions-adapter/internal/git"
 	"radicle-github-actions-adapter/internal/github"
+	"radicle-github-actions-adapter/internal/radicle"
 	"radicle-github-actions-adapter/internal/radiclegithubactions"
 	"radicle-github-actions-adapter/internal/readerwriterbroker"
 	"radicle-github-actions-adapter/pkg/env"
@@ -79,13 +80,17 @@ func main() {
 func run(logger *slog.Logger) error {
 	var cfg serve.AppConfig
 	cfg.RadicleHome = gohome.Expand(env.GetString("RAD_HOME", "~/.radicle"))
+	cfg.RadicleNodeURL = env.GetString("RADICLE_NODE_URL", "http://127.0.0.1:8080")
+	cfg.RadicleSessionToken = env.GetString("RADICLE_SESSION_TOKEN", "")
 	cfg.GitHubPAT = env.GetString("GITHUB_PAT", "")
 	cfg.WorkflowsPollTimoutSecs = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_SECS", 600)
 	if cfg.WorkflowsPollTimoutSecs == 0 {
 		cfg.WorkflowsPollTimoutSecs = 600
 	}
-	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome,
-		"WorkflowsPollTimoutSecs", cfg.WorkflowsPollTimoutSecs, "GitHubPAT length", len(cfg.GitHubPAT))
+
+	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome, "RadicleNodeURL", cfg.RadicleNodeURL,
+		"RadicleSessionToken", cfg.RadicleSessionToken, "WorkflowsPollTimoutSecs", cfg.WorkflowsPollTimoutSecs,
+		"GitHubPAT length", len(cfg.GitHubPAT))
 
 	var application serve.App
 	application.Config = cfg
@@ -95,7 +100,8 @@ func run(logger *slog.Logger) error {
 	gitOps := git.NewGit(logger)
 	gitHubOps := github.NewGitHub(cfg.GitHubPAT, logger)
 	gitHubActions := radiclegithubactions.NewRadicleGitHubActions(cfg.RadicleHome, gitOps, gitHubOps, logger)
-	srv := serve.NewGitHubActionsServer(&application, radicleBroker, gitHubActions)
+	radiclePatch := radicle.NewRadicle(cfg.RadicleNodeURL, cfg.RadicleSessionToken, logger)
+	srv := serve.NewGitHubActionsServer(&application, radicleBroker, gitHubActions, radiclePatch)
 
 	eventUUID := uuid.New().String()
 	ctx := context.WithValue(context.Background(), app.EventUUIDKey, eventUUID)

@@ -2,11 +2,13 @@ package serve
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"radicle-github-actions-adapter/app"
 	"radicle-github-actions-adapter/app/broker"
 	"radicle-github-actions-adapter/app/githubops"
+	"radicle-github-actions-adapter/app/radicle"
 	"time"
 )
 
@@ -14,6 +16,8 @@ type AppConfig struct {
 	RadicleHome             string
 	GitHubPAT               string
 	WorkflowsPollTimoutSecs uint64
+	RadicleNodeURL          string
+	RadicleSessionToken     string
 }
 
 type App struct {
@@ -26,14 +30,17 @@ type GitHubActionsServer struct {
 	App           *App
 	Broker        broker.Broker
 	GitHubActions app.GitHubActions
+	Radicle       radicle.Patch
 }
 
 // NewGitHubActionsServer returns a pointer to a new GitHub Action Server.
-func NewGitHubActionsServer(config *App, broker broker.Broker, GitHubActions app.GitHubActions) *GitHubActionsServer {
+func NewGitHubActionsServer(config *App, broker broker.Broker,
+	GitHubActions app.GitHubActions, radiclePatrch radicle.Patch) *GitHubActionsServer {
 	server := &GitHubActionsServer{
 		App:           config,
 		Broker:        broker,
 		GitHubActions: GitHubActions,
+		Radicle:       radiclePatrch,
 	}
 	return server
 }
@@ -73,7 +80,6 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		gas.App.Logger.Error("repo has no github workflows setup")
 		return nil
 	}
-
 	workflowsResult, err := gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
 	if err != nil {
 		gas.App.Logger.Error("repo has no github workflows setup")
@@ -86,10 +92,17 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	for _, workflowResult := range workflowsResult {
 		resultResponse.ResultDetails = append(resultResponse.ResultDetails, broker.WorkflowDetails{
 			WorkflowID:     workflowResult.WorkflowID,
+			WorkflowName:   workflowResult.WorkflowName,
 			WorkflowResult: workflowResult.Result,
 		})
 		if workflowResult.Result != githubops.WorkflowResultSuccess {
 			resultResponse.Result = app.BrokerResultFailure
+		}
+	}
+	if brokerRequestMessage.PatchEvent != nil {
+		err = gas.commentOnPatch(ctx, brokerRequestMessage, resultResponse, *repoCommitWorkflowSetup)
+		if err != nil {
+			gas.App.Logger.Warn("could not comment on patch", "error", err.Error())
 		}
 	}
 	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", resultResponse))
@@ -102,6 +115,47 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	return nil
 }
 
+func (gas *GitHubActionsServer) commentOnPatch(ctx context.Context, brokerRequestMessage *broker.RequestMessage,
+	resultResponse broker.ResponseMessage, gitHubActionsSettings app.GitHubActionsSettings) error {
+	if len(brokerRequestMessage.PatchEvent.Patch.Revisions) == 0 {
+		return errors.New("no revision found in patch")
+	}
+	revision := brokerRequestMessage.PatchEvent.Patch.Revisions[len(brokerRequestMessage.PatchEvent.Patch.
+		Revisions)-1]
+	commentMessage := gas.preparePatchCommentMessage(resultResponse, gitHubActionsSettings)
+	return gas.Radicle.Comment(ctx, brokerRequestMessage.Repo, brokerRequestMessage.PatchEvent.Patch.ID, revision.ID,
+		commentMessage)
+}
+
+// preparePatchCommentMessage prepares a message for adding as patch comment with the workflow resutls.
+func (gas *GitHubActionsServer) preparePatchCommentMessage(resultResponse broker.ResponseMessage, gitHubActionsSettings app.GitHubActionsSettings) string {
+	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
+	commentMessage := "Github Actions Result: " + resultResponse.Result
+	if resultResponse.Result == githubops.WorkflowResultSuccess {
+		commentMessage += " ✅"
+	} else {
+		commentMessage += " ❌"
+	}
+
+	commentMessage += "\n\nDetails:"
+	for _, result := range resultResponse.ResultDetails {
+		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo, result.WorkflowID)
+		commentMessage += "\n\n - "
+		commentMessage += `<a href="` + url + `" target="_blank" >` + result.WorkflowName + " (" + result.
+			WorkflowID + ")</a>: " + result.WorkflowResult
+		if result.WorkflowResult == githubops.WorkflowResultSuccess {
+			commentMessage += " 🟢"
+		} else if result.WorkflowResult == githubops.WorkflowResultFailure {
+			commentMessage += " 🔴"
+		} else {
+			commentMessage += " 🟡"
+		}
+	}
+	return commentMessage
+}
+
+// waitRepoCommitWorkflows waits for all workflows to complete execution and returns their results.
+// Wait time is upper bounded by WorkflowCheckInterval.
 func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 	repoCommitWorkflowSetup *app.GitHubActionsSettings, brokerRequestMessage *broker.RequestMessage) ([]app.
 	WorkflowResult, error) {
