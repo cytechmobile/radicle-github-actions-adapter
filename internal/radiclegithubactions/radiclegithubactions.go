@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	RadicleGitHubActionsSettingsPath string = "/.radicle/github_actions.yaml"
-	GitHubActionsWorkflowsPath       string = "/.github/workflows"
+	radicleGitHubActionsSettingsPath string = "/.radicle/github_actions.yaml"
+	gitHubActionsWorkflowsPath       string = "/.github/workflows"
 )
 
 type RadicleGitHubActions struct {
@@ -34,10 +34,12 @@ func NewRadicleGitHubActions(radicleHome string, gitOps gitops.GitOps, githubOps
 }
 
 // GetRepoCommitWorkflowSetup returns the GitHub Actions setup if any.
+// The setup is located at gitHubActionsWorkflowsPath path.
+// Checks also if there are registered workflows under radicleGitHubActionsSettingsPath
 func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context, projectID,
 	commitHash string) (*app.GitHubActionsSettings, error) {
 	repoPath := ctx.Value(app.RepoClonePath).(string)
-	projectID = strings.Trim(projectID, "rad:")
+	projectID = strings.TrimPrefix(projectID, "rad:")
 	cloneURL := fmt.Sprintf("file://%s/storage/%s", rga.radicleHome, projectID)
 	defer os.RemoveAll(repoPath)
 
@@ -48,7 +50,7 @@ func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context,
 		return nil, err
 	}
 
-	githubActionsSetup, err := rga.getRadicleGitHubActionsSetup(repoPath + RadicleGitHubActionsSettingsPath)
+	githubActionsSetup, err := rga.getRadicleGitHubActionsSetup(repoPath + radicleGitHubActionsSettingsPath)
 	if err != nil || githubActionsSetup == nil {
 		rga.logger.Warn("no GitHub Actions setup found", "reason", err.Error())
 		return nil, nil
@@ -58,7 +60,7 @@ func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context,
 		return nil, nil
 	}
 
-	githubActionsYamlFilePaths, err := rga.listYAMLFiles(repoPath + GitHubActionsWorkflowsPath)
+	githubActionsYamlFilePaths, err := rga.listYAMLFiles(repoPath + gitHubActionsWorkflowsPath)
 	if err != nil || len(githubActionsYamlFilePaths) == 0 {
 		rga.logger.Warn("no GitHub Actions workflows files found")
 		return nil, nil
@@ -67,8 +69,8 @@ func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context,
 	return githubActionsSetup, nil
 }
 
-// GetRepoCommitWorkflows retrieves the repo's workflows results from GitHub.
-func (rga *RadicleGitHubActions) GetRepoCommitWorkflows(ctx context.Context, githubUsername, githubRepo,
+// GetRepoCommitWorkflowsResults retrieves the repo's workflows results from GitHub.
+func (rga *RadicleGitHubActions) GetRepoCommitWorkflowsResults(ctx context.Context, githubUsername, githubRepo,
 	githubCommit string) ([]app.WorkflowResult, error) {
 	err := rga.github.CheckRepoCommit(ctx, githubUsername, githubRepo, githubCommit)
 	if err != nil {

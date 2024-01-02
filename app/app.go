@@ -30,6 +30,6 @@ type WorkflowResult struct {
 // GitHubActions should be implemented to retrieve the GitHub Actions' outcome
 type GitHubActions interface {
 	GetRepoCommitWorkflowSetup(ctx context.Context, projectID, commitHash string) (*GitHubActionsSettings, error)
-	GetRepoCommitWorkflows(ctx context.Context, githubUsername, githubRepo,
+	GetRepoCommitWorkflowsResults(ctx context.Context, githubUsername, githubRepo,
 		githubCommit string) ([]WorkflowResult, error)
 }
