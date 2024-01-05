@@ -68,3 +68,35 @@ Now every push should be done to using `both` remote. So pushing a commit should
 ```bash
 git push both main
 ```
+
+### Opening a patch
+
+In order to open a patch to radicle and get the results from the GitHub Actions workflows the refs must be pushed to 
+both forges. In order to do that follow these steps:
+
+* Checkout to a new branch:
+
+```bash
+git checkout -b new-feature-x
+```
+
+* Do your changes and commit them
+```bash
+git add .
+git commit -m 'Implemented feature X'
+```
+
+* Push to both remotes
+```bash
+git push both new-feature-x
+```
+
+* Open the path at Radicle and wait for the workflows' results to appear
+```bash
+git push rad -o patch.message="Implemented feature X" HEAD:refs/patches
+```
+
+If everything is set up correctly, a comment will ba added to the patch indicating the results of the GitHub Actions 
+workflows.
+
+![github-actions-patch-comment.png](github-actions-patch-comment.png)
