@@ -118,6 +118,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 func (gas *GitHubActionsServer) commentOnPatch(ctx context.Context, brokerRequestMessage *broker.RequestMessage,
 	resultResponse broker.ResponseMessage, gitHubActionsSettings app.GitHubActionsSettings) error {
 	if len(brokerRequestMessage.PatchEvent.Patch.Revisions) == 0 {
+		gas.App.Logger.Warn("could not comment on patch", "error", "no revision found in patch")
 		return errors.New("no revision found in patch")
 	}
 	revision := brokerRequestMessage.PatchEvent.Patch.Revisions[len(brokerRequestMessage.PatchEvent.Patch.
