@@ -44,7 +44,6 @@ func (g *Git) CloneRepoCommit(url, commitHash, repoPath string) error {
 		g.logger.Error(err.Error())
 		return err
 	}
-
 	worktree, err := repo.Worktree()
 	if err != nil {
 		g.logger.Error(err.Error())
@@ -64,6 +63,5 @@ func (g *Git) CloneRepoCommit(url, commitHash, repoPath string) error {
 		g.logger.Error(err.Error())
 		return err
 	}
-
 	return nil
 }
