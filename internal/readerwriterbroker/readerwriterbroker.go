@@ -35,6 +35,7 @@ func (sb *ReaderWriterBroker) ParseRequestMessage(ctx context.Context) (*broker.
 	input = []byte(strings.ReplaceAll(string(input), "\n", ""))
 	messageType, err := sb.parseRequestMessageType(input)
 	if err != nil {
+		sb.logger.Error("could not parse request message", "error", err.Error())
 		return nil, err
 	}
 	requestMessage := broker.RequestMessage{}
@@ -44,7 +45,7 @@ func (sb *ReaderWriterBroker) ParseRequestMessage(ctx context.Context) (*broker.
 		err := json.Unmarshal(input, &requestMessageTypePush)
 		if err != nil {
 			sb.logger.Error("could not unmarshal request message to push event message")
-			return &requestMessage, errors.New("could not unmarshal request message to push event message")
+			return nil, errors.New("could not unmarshal request message to push event message")
 		}
 		requestMessage.PushEvent = &requestMessageTypePush
 		requestMessage.Repo = requestMessageTypePush.Repository.ID
@@ -55,7 +56,7 @@ func (sb *ReaderWriterBroker) ParseRequestMessage(ctx context.Context) (*broker.
 		err := json.Unmarshal(input, &requestMessageTypePatch)
 		if err != nil {
 			sb.logger.Error("could not unmarshal request message to patch event message")
-			return &requestMessage, errors.New("could not unmarshal request message to patch event message")
+			return nil, errors.New("could not unmarshal request message to patch event message")
 		}
 		requestMessage.PatchEvent = &requestMessageTypePatch
 		requestMessage.Repo = requestMessageTypePatch.Repository.ID

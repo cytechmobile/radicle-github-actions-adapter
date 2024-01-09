@@ -25,7 +25,7 @@ func (mgo *MockGitOps) CloneRepoCommit(url, commitHash, repoPath string) error {
 type MockGitHubOps struct{}
 
 func (mgho *MockGitHubOps) CheckRepoCommit(ctx context.Context, user, repo, commit string) error {
-	if user != "gh_username" || repo != "gh_reponame" || commit != "commit_id" {
+	if user != "gh_username" || repo != "gh_reponame" {
 		return errors.New("invalid params")
 	}
 	return nil
@@ -189,7 +189,52 @@ func TestRadicleGitHubActions_GetRepoCommitWorkflowSetup(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "GetRepoCommitWorkflowSetup returns nothing when fail to parse radicle github acrtions setup",
+			name: "GetRepoCommitWorkflowSetup fails when invalid commit is used",
+			fields: fields{
+				logger:      logger,
+				radicleHome: "/home/user",
+				git:         &mockGitOps,
+				github:      &mockGitHubOps,
+			},
+			prepareFunc: func() error {
+				err := os.MkdirAll("/tmp/some_repo_path/.github/workflows", 0700)
+				if err != nil {
+					t.Errorf("GetRepoCommitWorkflowSetup() could not prepare test, error = %v", err)
+					return err
+				}
+				_, err = os.Create("/tmp/some_repo_path/.github/workflows/some_workflow.yaml")
+				if err != nil {
+					t.Errorf("GetRepoCommitWorkflowSetup() could not prepare test, error = %v", err)
+					return err
+				}
+
+				err = os.MkdirAll("/tmp/some_repo_path/.radicle", 0700)
+				if err != nil {
+					t.Errorf("GetRepoCommitWorkflowSetup() could not prepare test, error = %v", err)
+					return err
+				}
+				f, err := os.Create("/tmp/some_repo_path/.radicle/github_actions.yaml")
+				if err != nil {
+					t.Errorf("GetRepoCommitWorkflowSetup() could not prepare test, error = %v", err)
+					return err
+				}
+				_, err = f.WriteString("github_username: gh_username\ngithub_repo: gh_reponame")
+				if err != nil {
+					t.Errorf("GetRepoCommitWorkflowSetup() could not prepare test, error = %v", err)
+					return err
+				}
+				return nil
+			},
+			args: args{
+				ctx:        ctx,
+				projectID:  "project_id",
+				commitHash: "invalid_commit_id",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "GetRepoCommitWorkflowSetup returns nothing when fail to parse radicle github actions setup",
 			fields: fields{
 				logger:      logger,
 				radicleHome: "/home/user",
@@ -333,7 +378,7 @@ func TestRadicleGitHubActions_GetRepoCommitWorkflowsResults(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "GetRepoCommitWorkflowsResults fails when invalid commit is udes",
+			name: "GetRepoCommitWorkflowsResults fails when invalid commit is used",
 			fields: fields{
 				logger:      logger,
 				radicleHome: "/home/user",

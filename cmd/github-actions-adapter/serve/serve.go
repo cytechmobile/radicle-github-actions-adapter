@@ -128,7 +128,7 @@ func (gas *GitHubActionsServer) commentOnPatch(ctx context.Context, brokerReques
 		commentMessage)
 }
 
-// preparePatchCommentMessage prepares a message for adding as patch comment with the workflow resutls.
+// preparePatchCommentMessage prepares a message for adding as patch comment with the workflow results.
 func (gas *GitHubActionsServer) preparePatchCommentMessage(resultResponse broker.ResponseMessage, gitHubActionsSettings app.GitHubActionsSettings) string {
 	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
 	commentMessage := "Github Actions Result: " + resultResponse.Result

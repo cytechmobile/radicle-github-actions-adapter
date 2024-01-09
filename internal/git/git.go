@@ -51,6 +51,11 @@ func (g *Git) CloneRepoCommit(url, commitHash, repoPath string) error {
 	}
 
 	// Checkout to the specific commit
+	_, err = repo.CommitObject(plumbing.NewHash(commitHash))
+	if err != nil {
+		g.logger.Error(err.Error())
+		return err
+	}
 	err = worktree.Checkout(&git.CheckoutOptions{
 		Hash: plumbing.NewHash(commitHash),
 	})

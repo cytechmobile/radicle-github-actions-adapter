@@ -50,7 +50,7 @@ func TestNewReaderWriterBroker(t *testing.T) {
 	}
 }
 
-func TestReaderWriterBroker_ParseRequest(t *testing.T) {
+func TestReaderWriterBroker_ParseRequestMessage(t *testing.T) {
 	type fields struct {
 		BrokerReader io.Reader
 		BrokerWriter io.Writer
@@ -66,7 +66,7 @@ func TestReaderWriterBroker_ParseRequest(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Test valid push request to ParseRequest",
+			name: "Test valid push request to ParseRequestMessage",
 			fields: fields{
 				BrokerReader: strings.NewReader(`{"request": "trigger","event_type": "push","pusher": {"id": "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias": "node_alias"},"before": "<BEFORE_COMMIT>","after": "<AFTER_COMMIT>","commits": ["<SOME_OTHER_COMMIT_BEING_PUSHED>", "<AFTER_COMMIT>" ], "repository": { "id": "<RID>", "name": "heartwood", "description": "Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private": false,"default_branch": "main","delegates": ["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa", "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
 				BrokerWriter: &bytes.Buffer{},
@@ -99,9 +99,9 @@ func TestReaderWriterBroker_ParseRequest(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test invalid push request to ParseRequest - invalid request",
+			name: "Test invalid request to ParseRequestMessage - invalid request",
 			fields: fields{
-				BrokerReader: strings.NewReader(`{"request": 1,"event_type": "push","pusher": {"id": "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias": "node_alias"},"before": "<BEFORE_COMMIT>","after": "<AFTER_COMMIT>","commits": ["<SOME_OTHER_COMMIT_BEING_PUSHED>", "<AFTER_COMMIT>" ], "repository": { "id": "<RID>", "name": "heartwood", "description": "Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private": false,"default_branch": "main","delegates": ["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa", "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
+				BrokerReader: strings.NewReader(`{"request": 1`),
 				BrokerWriter: &bytes.Buffer{},
 			},
 			args:    args{ctx: context.TODO()},
@@ -109,9 +109,19 @@ func TestReaderWriterBroker_ParseRequest(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Test invalid request to ParseRequest - invalid event_type",
+			name: "Test invalid push request to ParseRequestMessage - invalid request",
 			fields: fields{
-				BrokerReader: strings.NewReader(`{"request": "trigger","event_type": "unknow","pusher": {"id": "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias": "node_alias"},"before": "<BEFORE_COMMIT>","after": "<AFTER_COMMIT>","commits": ["<SOME_OTHER_COMMIT_BEING_PUSHED>", "<AFTER_COMMIT>" ], "repository": { "id": "<RID>", "name": "heartwood", "description": "Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private": false,"default_branch": "main","delegates": ["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa", "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
+				BrokerReader: strings.NewReader(`{"request": "trigger","event_type": "push","pusher": {"id": 123,"alias": "node_alias"},"before": "<BEFORE_COMMIT>","after": "<AFTER_COMMIT>","commits": ["<SOME_OTHER_COMMIT_BEING_PUSHED>", "<AFTER_COMMIT>" ], "repository": { "id": "<RID>", "name": "heartwood", "description": "Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private": false,"default_branch": "main","delegates": ["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa", "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
+				BrokerWriter: &bytes.Buffer{},
+			},
+			args:    args{ctx: context.TODO()},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "Test invalid request to ParseRequestMessage - invalid event_type",
+			fields: fields{
+				BrokerReader: strings.NewReader(`{"request": "trigger","event_type": "unknown","pusher": {"id": "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias": "node_alias"},"before": "<BEFORE_COMMIT>","after": "<AFTER_COMMIT>","commits": ["<SOME_OTHER_COMMIT_BEING_PUSHED>", "<AFTER_COMMIT>" ], "repository": { "id": "<RID>", "name": "heartwood", "description": "Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private": false,"default_branch": "main","delegates": ["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa", "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
 				BrokerWriter: &bytes.Buffer{},
 			},
 			args:    args{ctx: context.TODO()},
@@ -120,7 +130,18 @@ func TestReaderWriterBroker_ParseRequest(t *testing.T) {
 		},
 
 		{
-			name: "Test valid patch request to ParseRequest",
+			name: "Test invalid request to ParseRequestMessage - invalid request",
+			fields: fields{
+				BrokerReader: strings.NewReader(`{"request": "some request","event_type": "push","pusher": {"id": "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias": "node_alias"},"before": "<BEFORE_COMMIT>","after": "<AFTER_COMMIT>","commits": ["<SOME_OTHER_COMMIT_BEING_PUSHED>", "<AFTER_COMMIT>" ], "repository": { "id": "<RID>", "name": "heartwood", "description": "Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private": false,"default_branch": "main","delegates": ["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa", "did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
+				BrokerWriter: &bytes.Buffer{},
+			},
+			args:    args{ctx: context.TODO()},
+			want:    nil,
+			wantErr: true,
+		},
+
+		{
+			name: "Test valid patch request to ParseRequestMessage",
 			fields: fields{
 				BrokerReader: strings.NewReader(`{"request":"trigger","event_type":"patch","action":"created","patch":{"id":"<PATCH_ID>","author":{"id":"did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias":"node_alias"},"title":"Add description in README","state":{"status":"Open","conflicts":[{"revision_id":"rev1","oid":"id1"}]},"before":"<BEFORE_COMMIT>","after":"<AFTER_COMMIT>","commits":["<SOME_OTHER_COMMIT_BEING_PUSHED>","<AFTER_COMMIT>"],"target":"delegates","labels":["small","goodFirstIssue","enhancement","bug"],"assignees":["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa"],"revisions":[{"id":"41aafe22200464bf905b143d4233f7f1fa4a9123","author":{"id":"did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias":"my_alias"},"description":"The revision description","base":"193ed2f675ac6b0d1ab79ed65057c8a56a4fab23","oid":"f0f5d38ffa8d54a7cc737fc4e75ab1e2e178eaa1","timestamp":1699437445}]},"repository":{"id":"<RID>","name":"heartwood","description":"Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private":false,"default_branch":"main","delegates":["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
 				BrokerWriter: &bytes.Buffer{},
@@ -180,6 +201,16 @@ func TestReaderWriterBroker_ParseRequest(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{
+			name: "Test invalid patch request to ParseRequestMessage - invalid request",
+			fields: fields{
+				BrokerReader: strings.NewReader(`{"request":"trigger","event_type":"patch","action":"created","patch":{"id":123,"author":{"id":"did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias":"node_alias"},"title":"Add description in README","state":{"status":"Open","conflicts":[{"revision_id":"rev1","oid":"id1"}]},"before":"<BEFORE_COMMIT>","after":"<AFTER_COMMIT>","commits":["<SOME_OTHER_COMMIT_BEING_PUSHED>","<AFTER_COMMIT>"],"target":"delegates","labels":["small","goodFirstIssue","enhancement","bug"],"assignees":["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa"],"revisions":[{"id":"41aafe22200464bf905b143d4233f7f1fa4a9123","author":{"id":"did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","alias":"my_alias"},"description":"The revision description","base":"193ed2f675ac6b0d1ab79ed65057c8a56a4fab23","oid":"f0f5d38ffa8d54a7cc737fc4e75ab1e2e178eaa1","timestamp":1699437445}]},"repository":{"id":"<RID>","name":"heartwood","description":"Radicle is a sovereign peer-to-peer network for code collaboration, built on top of Git.","private":false,"default_branch":"main","delegates":["did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRa","did:key:z6MkltRpzcq2ybm13yQpyre58JUeMvZY6toxoZVpLZ8YabRb"]}}`),
+				BrokerWriter: &bytes.Buffer{},
+			},
+			args:    args{ctx: context.TODO()},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
