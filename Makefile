@@ -16,6 +16,7 @@ help:
 .PHONY: tidy
 tidy:
 	go fmt ./...
+	go get -u ./...
 	go mod tidy -v
 
 ## audit: run quality control checks
