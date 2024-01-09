@@ -105,7 +105,7 @@ func run(logger *slog.Logger) error {
 
 	eventUUID := uuid.New().String()
 	ctx := context.WithValue(context.Background(), app.EventUUIDKey, eventUUID)
-	ctx = context.WithValue(ctx, app.RepoClonePath, eventUUID)
+	ctx = context.WithValue(ctx, app.RepoClonePathKey, eventUUID)
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Error("could not serve radicle GitHub Actions", "error", r)
@@ -115,20 +115,26 @@ func run(logger *slog.Logger) error {
 					Error: fmt.Sprintf("%+v", r),
 				},
 			}
-			radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
+			err := radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
+			if err != nil {
+				logger.Error("could not respond to broker", "error", err.Error())
+			}
 		}
 	}()
 
 	err := srv.Serve(ctx)
 	if err != nil {
+		logger.Error("could not serve radicle GitHub Actions", "error", err.Error())
 		resultErrorResponse := broker.ResponseErrorMessage{
 			Response: app.BrokerResponseFinished,
 			Result: broker.ErrorMessage{
 				Error: err.Error(),
 			},
 		}
-		radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
-		logger.Error("could not serve radicle GitHub Actions", "error", err.Error())
+		err = radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
+		if err != nil {
+			logger.Error("could not respond to broker", "error", err.Error())
+		}
 	}
 	return err
 }

@@ -40,8 +40,8 @@ func (a *Actions) ListRepositoryWorkflowRuns(ctx context.Context, owner, repo st
 		}
 
 		if totalWorkflows < (opts.Page)*opts.PerPage {
-			return nil, nil, errors.New(fmt.Sprintf("request exceeds total workflows %v, %v, %v", totalWorkflows,
-				opts.Page, opts.PerPage))
+			return nil, nil, fmt.Errorf("request exceeds total workflows %v, %v, %v", totalWorkflows,
+				opts.Page, opts.PerPage)
 		}
 		runs := github.WorkflowRuns{
 			TotalCount:   &totalWorkflows,

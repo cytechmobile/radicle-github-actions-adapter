@@ -57,7 +57,7 @@ func TestRadicleGitHubActions_GetRepoCommitWorkflowSetup(t *testing.T) {
 	mockGitOps := MockGitOps{}
 	mockGitHubOps := MockGitHubOps{}
 	logger := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{}))
-	ctx := context.WithValue(context.Background(), app.RepoClonePath, "/tmp/some_repo_path")
+	ctx := context.WithValue(context.Background(), app.RepoClonePathKey, "/tmp/some_repo_path")
 	type fields struct {
 		logger      *slog.Logger
 		radicleHome string
@@ -310,7 +310,7 @@ func TestRadicleGitHubActions_GetRepoCommitWorkflowsResults(t *testing.T) {
 	mockGitOps := MockGitOps{}
 	mockGitHubOps := MockGitHubOps{}
 	logger := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{}))
-	ctx := context.WithValue(context.Background(), app.RepoClonePath, "/tmp/random_repo_path")
+	ctx := context.WithValue(context.Background(), app.RepoClonePathKey, "/tmp/random_repo_path")
 	type fields struct {
 		logger      *slog.Logger
 		radicleHome string

@@ -49,7 +49,7 @@ func NewGitHubActionsServer(config *App, broker broker.Broker,
 // It also manages replies to the broker.
 func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	eventUUID := ctx.Value(app.EventUUIDKey).(string)
-	gas.App.Logger.Info("serving event", app.EventUUIDKey, eventUUID)
+	gas.App.Logger.Info("serving event", app.EventUUIDKey.String(), eventUUID)
 	brokerRequestMessage, err := gas.Broker.ParseRequestMessage(ctx)
 	if err != nil {
 		gas.App.Logger.Error(err.Error())

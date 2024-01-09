@@ -38,7 +38,7 @@ func NewRadicleGitHubActions(radicleHome string, gitOps gitops.GitOps, githubOps
 // Checks also if there are registered workflows under radicleGitHubActionsSettingsPath
 func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context, projectID,
 	commitHash string) (*app.GitHubActionsSettings, error) {
-	repoPath := ctx.Value(app.RepoClonePath).(string)
+	repoPath := ctx.Value(app.RepoClonePathKey).(string)
 	projectID = strings.TrimPrefix(projectID, "rad:")
 	cloneURL := fmt.Sprintf("file://%s/storage/%s", rga.radicleHome, projectID)
 	defer os.RemoveAll(repoPath)

@@ -24,7 +24,7 @@ func (m *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 
 func TestRadicle_Comment(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{}))
-	ctx := context.WithValue(context.Background(), app.RepoClonePath, "repo_path")
+	ctx := context.WithValue(context.Background(), app.RepoClonePathKey, "repo_path")
 	type fields struct {
 		nodeURL      string
 		token        string

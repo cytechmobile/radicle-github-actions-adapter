@@ -71,6 +71,9 @@ func TestGit_CloneRepoCommit(t *testing.T) {
 						When:  time.Now(),
 					},
 				})
+				if err != nil {
+					return "", err
+				}
 
 				//Create new branch to apply changes
 				w, err = repo.Worktree()
@@ -165,7 +168,9 @@ func TestGit_CloneRepoCommit(t *testing.T) {
 						When:  time.Now(),
 					},
 				})
-
+				if err != nil {
+					return "", err
+				}
 				return "some_random_hash", err
 			},
 			cleanupFunc: func() {

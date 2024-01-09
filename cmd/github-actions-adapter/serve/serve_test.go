@@ -243,7 +243,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
-					"event-uuid-push-valid-1"), app.RepoClonePath, "event-uuid-push-valid-1"),
+					"event-uuid-push-valid-1"), app.RepoClonePathKey, "event-uuid-push-valid-1"),
 			},
 			wantErr: false,
 		},
@@ -266,7 +266,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
-					"event-uuid-push-valid-2"), app.RepoClonePath, "event-uuid-push-valid-2"),
+					"event-uuid-push-valid-2"), app.RepoClonePathKey, "event-uuid-push-valid-2"),
 			},
 			wantErr: false,
 		},
@@ -289,7 +289,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
-					"event-uuid-push-invalid-1"), app.RepoClonePath, "event-uuid-push-invalid-1"),
+					"event-uuid-push-invalid-1"), app.RepoClonePathKey, "event-uuid-push-invalid-1"),
 			},
 			wantErr: true,
 		},
@@ -313,7 +313,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
-					"event-uuid-invalid"), app.RepoClonePath, "event-uuid-invalid"),
+					"event-uuid-invalid"), app.RepoClonePathKey, "event-uuid-invalid"),
 			},
 			wantErr: true,
 		},
@@ -336,7 +336,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
-					"event-uuid-patch-valid-1"), app.RepoClonePath, "event-uuid-patch-valid-1"),
+					"event-uuid-patch-valid-1"), app.RepoClonePathKey, "event-uuid-patch-valid-1"),
 			},
 			wantErr: false,
 		},
@@ -359,7 +359,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
-					"event-uuid-patch-valid-2"), app.RepoClonePath, "event-uuid-patch-valid-2"),
+					"event-uuid-patch-valid-2"), app.RepoClonePathKey, "event-uuid-patch-valid-2"),
 			},
 			wantErr: false,
 		},
@@ -382,7 +382,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
-					"event-uuid-patch-invalid-1"), app.RepoClonePath, "event-uuid-patch-invalid-1"),
+					"event-uuid-patch-invalid-1"), app.RepoClonePathKey, "event-uuid-patch-invalid-1"),
 			},
 			wantErr: true,
 		},

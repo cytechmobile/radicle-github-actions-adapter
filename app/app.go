@@ -5,15 +5,21 @@ import (
 	"time"
 )
 
+type ContextKey string
+
 const (
-	EventUUIDKey            string        = "event-uuid"
-	RepoClonePath           string        = "repo-path"
+	EventUUIDKey            ContextKey    = "event-uuid"
+	RepoClonePathKey        ContextKey    = "repo-path"
 	BrokerResponseFinished  string        = "finished"
 	BrokerResponseTriggered string        = "triggered"
 	BrokerResultSuccess     string        = "success"
 	BrokerResultFailure     string        = "failure"
 	WorkflowCheckInterval   time.Duration = 10 * time.Second
 )
+
+func (ck ContextKey) String() string {
+	return string(ck)
+}
 
 type GitHubActionsSettings struct {
 	GitHubUsername string `yaml:"github_username"`
