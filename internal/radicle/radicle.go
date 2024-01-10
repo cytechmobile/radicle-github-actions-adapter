@@ -45,7 +45,6 @@ func (r *Radicle) Comment(ctx context.Context, repoID, patchID, revisionID strin
 	headers["content-type"] = "application/json"
 	headers["Authorization"] = "Bearer " + r.token
 	return r.request(ctx, createRadiclePatchComment, http.MethodPatch, headers, payload)
-
 }
 
 type HttpError struct {

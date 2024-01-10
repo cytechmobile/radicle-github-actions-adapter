@@ -1,0 +1,41 @@
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Install requirements
+        run: |
+          apt-get update
+          apt-get install -y make
+          apt-get install -y git
+          apt-get install -y gcc
+          apt-get install -y ca-certificates
+
+      - name: Tidy
+        run: make tidy
+
+      - name: Audit
+        run: make audit
+
+      - name: Lint
+        run: make lint
+
+      - name: Build
+        run: make build
+
+      - name: Test
+        run: make test
