@@ -89,19 +89,7 @@ are exchanges throughout the adapter's runtime:
 ```json
 {
    "response": "finished",
-   "result": "<success|failure>",
-   "result_details": [
-      {
-         "workflow_id": "7369195312",
-         "workflow_name": "Lint source code",
-         "workflow_result": "success"
-      },
-      {
-         "workflow_id": "7369195314",
-         "workflow_name": "Run unit tests",
-         "workflow_result": "failure"
-      }
-   ]
+   "result": "<success|failure>"
 }
 ```
 
