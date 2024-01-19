@@ -95,7 +95,7 @@ type ResponseMessage struct {
 	Response      string            `json:"response"`
 	RunID         *RunID            `json:"run_id,omitempty"`
 	Result        string            `json:"result,omitempty"`
-	ResultDetails []WorkflowDetails `json:"result_details,omitempty"`
+	ResultDetails []WorkflowDetails `json:"-"`
 }
 
 type WorkflowDetails struct {
