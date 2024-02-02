@@ -1,0 +1,36 @@
+---
+resources:
+  - name: github-actions-adapter
+    type: git
+    icon: git
+    source:
+      uri: https://radicle.yorgos.net.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
+      git_config:
+      - name: safe.directory
+        value: /tmp/build/get
+
+jobs:
+# update this pipeline before updating child pipelines
+
+- name: set-self
+  public: true
+  plan:
+  - get: github-actions-adapter
+    trigger: true
+  - set_pipeline: self
+    file: github-actions-adapter/.concourse/set-pipeline.yaml
+    vars:
+      access_key_id: ((access_key_id))
+      secret_access_key: ((secret_access_key))
+
+- name: set-pipelines
+  public: true
+  plan:
+  - get: github-actions-adapter
+    trigger: true
+    passed: [set-self]
+  - set_pipeline: github-actions-adapter-releases
+    file: github-actions-adapter/.concourse/release-pipeline.yaml
+    vars:
+      access_key_id: ((access_key_id))
+      secret_access_key: ((secret_access_key))
