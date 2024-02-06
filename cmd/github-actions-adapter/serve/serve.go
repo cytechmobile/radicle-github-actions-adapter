@@ -83,7 +83,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	workflowsResult, err := gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
 	if err != nil {
 		gas.App.Logger.Error("repo has no github workflows setup")
-		return err
+		return nil
 	}
 	resultResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseFinished,
