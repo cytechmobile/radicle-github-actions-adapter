@@ -37,7 +37,7 @@ jobs:
           repository: golang
           tag: 1.21.0
       inputs:
-        - name: source-code
+      - name: github-actions-adapter
       run:
         path: sh
         args:
