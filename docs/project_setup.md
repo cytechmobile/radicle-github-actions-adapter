@@ -6,6 +6,18 @@ will inform back the broker with any results and also update any patch using com
 
 ## Project Setup
 
+In order to setup a project/repository to work with the Radicle Github Adapter we must add some metadata within the 
+repo about the Github Repository (workspace & repo name). We must also be able to push any change to both the 
+Radicle forge and the Github forge at the same time.
+
+This can be done manually by following the manual steps bellow or by using the script provided with
+```bash
+scripts/setup-rad-gh-remotes.sh
+```
+
+The script must be run within the repository that we want to set it up.
+The repository should be already initialised as a Radicle repository for this script to work.
+
 ### Radicle settings for GitHub Actions
 
 Repository should persist information in order to store the GitHub's username and repository that the actions will run.
@@ -24,13 +36,13 @@ Radicle. This way source code will be hosted in Radicle's network but also GitHu
 Radicle GitHub Actions adapter will inform the Radicle project for any GitHub Actions' status through the Radicle Ci 
 Broker.
 
-The process for adding both push servers is to update `git remotes`. This can be done using the following commands 
+The process for adding both push servers is to update `git remotes`.  This can be done using the following commands 
 within the project's root directory:
 
 ```bash
 git remote add both rad://REPO_ID
-git remote set-url --push both rad://REPO_ID/NODE_ID
-git remote set-url --add --push both < https://github.com/user/repo.git > OR git remote set-url --add --push both < git@github.com:user/repo.git >
+git remote set-url --push both < https://github.com/user/repo.git > OR git remote set-url --add --push both < git@github.com:user/repo.git >
+git remote set-url --add --push both rad://REPO_ID/NODE_ID
 ```
 
 Where:
@@ -68,6 +80,12 @@ Now every push should be done to using `both` remote. So pushing a commit should
 ```bash
 git push both main
 ```
+
+It is crucial to update the Github Repo before it updates the rad repo. The reason for this is that when the rad 
+repo is updated the Radicle CI Broker will receive a Node event and trigger the Github Actions Adapter. The adapter 
+will try to find the specific commit at the Github repo which might fail if the commit hasn't still been pushed to 
+the Github.
+
 
 ### Opening a patch
 
