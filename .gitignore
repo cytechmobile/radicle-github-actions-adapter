@@ -1,0 +1,27 @@
+# IDE meta files
+.vscode
+.idea
+
+# Mac OS X files
+.DS_Store
+
+# Binaries for programs and plugins
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Configuration
+.env
+

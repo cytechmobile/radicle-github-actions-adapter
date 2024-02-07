@@ -1,7 +1,7 @@
 # Radicle GitHub Actions Adapter
 
-An adapter for the Radicle Broker that report back to the broker the results from GitHub Actions than are executed 
-for each push.
+An adapter for the Radicle CI Broker (`rad:zwTxygwuz5LDGBq255RA2CbNGrz8`) that will report back to the broker the 
+results from GitHub Actions than are executed for each push.
 
 ## Documentation
 
