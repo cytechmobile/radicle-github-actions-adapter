@@ -28,13 +28,14 @@ order to have appropriate permissions to add comments into patches.
 The application uses configuration through Environment Variables. Here is a list with the details and the default
 value for each one of them:
 
-| EnvVar                        | Description                                 | Default Value           |
-|-------------------------------|---------------------------------------------|-------------------------|
-| `RAD_HOME`                    | Path for radicle home directory.            | "~/.radicle"            |
-| `RADICLE_NODE_URL`            | URL of Radicle node.                        | "http://127.0.0.1:8080" |
-| `RADICLE_SESSION_TOKEN`       | Session token for accessing Radicle API.    | ""                      |
-| `GITHUB_PAT`                  | Personal access token for GitHub            | ""                      |
-| `WORKFLOWS_POLL_TIMEOUT_SECS` | Timout for polling for workflows completion | 600                     |
+| EnvVar                        | Description                                                                  | Default Value           |
+|-------------------------------|------------------------------------------------------------------------------|-------------------------|
+| `LOG_LEVEL`                   | Set the log level of the application.<br>(`debug`, `info`, `warn`, `error`). | "info"                  |
+| `RAD_HOME`                    | Path for radicle home directory.                                             | "~/.radicle"            |
+| `RAD_HTTPD_URL`               | Public URL of radicle's HTTPD.                                               | "http://127.0.0.1:8080" |
+| `RAD_SESSION_TOKEN`           | Session token for accessing Radicle API.                                     | ""                      |
+| `GITHUB_PAT`                  | Personal access token for GitHub                                             | ""                      |
+| `WORKFLOWS_POLL_TIMEOUT_SECS` | Timout for polling for workflows completion                                  | 600                     |
 
 > `GITHUB_PAT` should have at least read access for the repo and the actions.
  

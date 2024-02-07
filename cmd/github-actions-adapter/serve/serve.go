@@ -16,7 +16,7 @@ type AppConfig struct {
 	RadicleHome             string
 	GitHubPAT               string
 	WorkflowsPollTimoutSecs uint64
-	RadicleNodeURL          string
+	RadicleHttpdURL         string
 	RadicleSessionToken     string
 }
 
@@ -83,7 +83,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	workflowsResult, err := gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
 	if err != nil {
 		gas.App.Logger.Error("repo has no github workflows setup")
-		return nil
+		return err
 	}
 	resultResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseFinished,
@@ -111,7 +111,6 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		gas.App.Logger.Error(err.Error())
 		return err
 	}
-
 	return nil
 }
 

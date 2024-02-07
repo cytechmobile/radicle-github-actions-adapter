@@ -22,27 +22,14 @@ import (
 )
 
 func main() {
-	logLevel := flag.String("loglevel", "info", "Log slogLevel: debug, info, warn, error")
+	envLogLevel := env.GetString("LOG_LEVEL", "info")
+	logLevel := flag.String("loglevel", envLogLevel, "Log level: debug, info, warn, error")
 	showVersion := flag.Bool("version", false, "Display binary version and exit")
 	flag.Parse()
 
 	if *showVersion {
 		fmt.Printf("version: %s\n", version.Get())
 		os.Exit(0)
-	}
-
-	slogLevel := slog.LevelInfo
-	if logLevel != nil {
-		switch *logLevel {
-		case "debug":
-			slogLevel = slog.LevelDebug
-		case "info":
-			slogLevel = slog.LevelInfo
-		case "wanr":
-			slogLevel = slog.LevelWarn
-		case "error":
-			slogLevel = slog.LevelError
-		}
 	}
 
 	wd, err := os.Getwd()
@@ -61,6 +48,8 @@ func main() {
 		}
 		return a
 	}
+
+	slogLevel := LogLevelToSlogLevel(logLevel)
 	slogHandlerOptions := slog.HandlerOptions{Level: slogLevel, ReplaceAttr: replacer}
 
 	//Print source only on debug level
@@ -75,20 +64,21 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
+	logger.Info("radicle-github-actions-adapter terminated successfully")
 }
 
 func run(logger *slog.Logger) error {
 	var cfg serve.AppConfig
 	cfg.RadicleHome = gohome.Expand(env.GetString("RAD_HOME", "~/.radicle"))
-	cfg.RadicleNodeURL = env.GetString("RADICLE_NODE_URL", "http://127.0.0.1:8080")
-	cfg.RadicleSessionToken = env.GetString("RADICLE_SESSION_TOKEN", "")
+	cfg.RadicleHttpdURL = env.GetString("RAD_HTTPD_URL", "http://127.0.0.1:8080")
+	cfg.RadicleSessionToken = env.GetString("RAD_SESSION_TOKEN", "")
 	cfg.GitHubPAT = env.GetString("GITHUB_PAT", "")
 	cfg.WorkflowsPollTimoutSecs = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_SECS", 600)
 	if cfg.WorkflowsPollTimoutSecs == 0 {
 		cfg.WorkflowsPollTimoutSecs = 600
 	}
 
-	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome, "RadicleNodeURL", cfg.RadicleNodeURL,
+	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome, "RadicleHttpdURL", cfg.RadicleHttpdURL,
 		"RadicleSessionToken", cfg.RadicleSessionToken, "WorkflowsPollTimoutSecs", cfg.WorkflowsPollTimoutSecs,
 		"GitHubPAT length", len(cfg.GitHubPAT))
 
@@ -100,7 +90,7 @@ func run(logger *slog.Logger) error {
 	gitOps := git.NewGit(logger)
 	gitHubOps := github.NewGitHub(cfg.GitHubPAT, logger)
 	gitHubActions := radiclegithubactions.NewRadicleGitHubActions(cfg.RadicleHome, gitOps, gitHubOps, logger)
-	radiclePatch := radicle.NewRadicle(cfg.RadicleNodeURL, cfg.RadicleSessionToken, logger)
+	radiclePatch := radicle.NewRadicle(cfg.RadicleHttpdURL, cfg.RadicleSessionToken, logger)
 	srv := serve.NewGitHubActionsServer(&application, radicleBroker, gitHubActions, radiclePatch)
 
 	eventUUID := uuid.New().String()
@@ -108,33 +98,48 @@ func run(logger *slog.Logger) error {
 	ctx = context.WithValue(ctx, app.RepoClonePathKey, eventUUID)
 	defer func() {
 		if r := recover(); r != nil {
-			logger.Error("could not serve radicle GitHub Actions", "error", r)
-			resultErrorResponse := broker.ResponseErrorMessage{
-				Response: app.BrokerResponseFinished,
-				Result: broker.ErrorMessage{
-					Error: fmt.Sprintf("%+v", r),
-				},
-			}
-			err := radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
-			if err != nil {
-				logger.Error("could not respond to broker", "error", err.Error())
-			}
+			err := fmt.Errorf("%+v", r)
+			_ = handleAppError(ctx, logger, err, radicleBroker)
 		}
 	}()
-
 	err := srv.Serve(ctx)
 	if err != nil {
-		logger.Error("could not serve radicle GitHub Actions", "error", err.Error())
-		resultErrorResponse := broker.ResponseErrorMessage{
-			Response: app.BrokerResponseFinished,
-			Result: broker.ErrorMessage{
-				Error: err.Error(),
-			},
-		}
-		err = radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
-		if err != nil {
-			logger.Error("could not respond to broker", "error", err.Error())
+		return handleAppError(ctx, logger, err, radicleBroker)
+	}
+
+	return nil
+}
+
+func handleAppError(ctx context.Context, logger *slog.Logger, err error,
+	radicleBroker *readerwriterbroker.ReaderWriterBroker) error {
+	logger.Error("could not serve radicle gitHub actions", "error", err.Error())
+	resultErrorResponse := broker.ResponseErrorMessage{
+		Response: app.BrokerResponseFinished,
+		Result: broker.ErrorMessage{
+			Error: err.Error(),
+		},
+	}
+	err = radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
+	if err != nil {
+		logger.Error("could not respond to broker", "error", err.Error())
+		return err
+	}
+	return nil
+}
+
+func LogLevelToSlogLevel(logLevel *string) slog.Level {
+	slogLevel := slog.LevelInfo
+	if logLevel != nil {
+		switch *logLevel {
+		case "debug":
+			slogLevel = slog.LevelDebug
+		case "info":
+			slogLevel = slog.LevelInfo
+		case "warn":
+			slogLevel = slog.LevelWarn
+		case "error":
+			slogLevel = slog.LevelError
 		}
 	}
-	return err
+	return slogLevel
 }
