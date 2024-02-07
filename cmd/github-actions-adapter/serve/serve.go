@@ -77,8 +77,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		return err
 	}
 	if repoCommitWorkflowSetup == nil {
-		gas.App.Logger.Error("repo has no github workflows setup")
-		return nil
+		gas.App.Logger.Warn("repo has no github workflows setup")
 	}
 	workflowsResult, err := gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
 	if err != nil {
@@ -100,7 +99,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		}
 	}
 	if brokerRequestMessage.PatchEvent != nil {
-		err = gas.commentOnPatch(ctx, brokerRequestMessage, resultResponse, *repoCommitWorkflowSetup)
+		err = gas.commentOnPatch(ctx, brokerRequestMessage, resultResponse, repoCommitWorkflowSetup)
 		if err != nil {
 			gas.App.Logger.Warn("could not comment on patch", "error", err.Error())
 		}
@@ -115,14 +114,17 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 }
 
 func (gas *GitHubActionsServer) commentOnPatch(ctx context.Context, brokerRequestMessage *broker.RequestMessage,
-	resultResponse broker.ResponseMessage, gitHubActionsSettings app.GitHubActionsSettings) error {
+	resultResponse broker.ResponseMessage, gitHubActionsSettings *app.GitHubActionsSettings) error {
+	if gitHubActionsSettings == nil {
+		return nil
+	}
 	if len(brokerRequestMessage.PatchEvent.Patch.Revisions) == 0 {
 		gas.App.Logger.Warn("could not comment on patch", "error", "no revision found in patch")
 		return errors.New("no revision found in patch")
 	}
 	revision := brokerRequestMessage.PatchEvent.Patch.Revisions[len(brokerRequestMessage.PatchEvent.Patch.
 		Revisions)-1]
-	commentMessage := gas.preparePatchCommentMessage(resultResponse, gitHubActionsSettings)
+	commentMessage := gas.preparePatchCommentMessage(resultResponse, *gitHubActionsSettings)
 	return gas.Radicle.Comment(ctx, brokerRequestMessage.Repo, brokerRequestMessage.PatchEvent.Patch.ID, revision.ID,
 		commentMessage)
 }
@@ -159,6 +161,9 @@ func (gas *GitHubActionsServer) preparePatchCommentMessage(resultResponse broker
 func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 	repoCommitWorkflowSetup *app.GitHubActionsSettings, brokerRequestMessage *broker.RequestMessage) ([]app.
 	WorkflowResult, error) {
+	if repoCommitWorkflowSetup == nil {
+		return nil, nil
+	}
 	var workflowsResult []app.WorkflowResult
 	var err error
 	var waitDuration time.Duration
