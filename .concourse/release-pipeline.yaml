@@ -27,6 +27,26 @@ jobs:
   - get: github-actions-adapter
     trigger: true
 
+  # test source
+  - task: test
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: golang
+          tag: 1.21.0
+      inputs:
+        - name: source-code
+      run:
+        path: sh
+        args:
+          - -c
+          - |
+            cd github-actions-adapter
+            make tidy
+            make test
+
   # build images
   - task: build-binaries
     config:
