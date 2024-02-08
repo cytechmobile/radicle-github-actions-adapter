@@ -182,7 +182,7 @@ func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 			}
 		}
 		if !workflowsCompleted {
-			if waitDuration >= time.Second*time.Duration(gas.App.Config.WorkflowsPollTimoutMins) {
+			if waitDuration >= time.Minute*time.Duration(gas.App.Config.WorkflowsPollTimoutMins) {
 				gas.App.Logger.Warn("reached timeout while waiting for workflows to complete")
 				break
 			}
