@@ -19,7 +19,7 @@ The minimum requirement for compiling and running this application are:
 - make
 
 Alongside the Radicle CI Broker, a Radicle node must be running on the same host.
-`radicle-httpd` is also required alongside the `RADICLE_SESSION_TOKEN` in order to add patch comments when a 
+`radicle-httpd` is also required alongside the `RAD_SESSION_TOKEN` in order to add patch comments when a 
 workflow completes. It is also required that the specific Radicle node is added as a delegate to the repositories in 
 order to have appropriate permissions to add comments into patches.
 
@@ -68,10 +68,10 @@ Here is an example version: `eecd4b8a194a24674b0ec30e60ef8c150918b975-dirty`
 
 Application binary accepts specific arguments at init time. There are:
 
-| Argument   | Example                                     | Description                                                                                                       | Default Value |
-|------------|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------|---------------|
-| `version`  | ./radicle-github-actions-adapter --version  | Prints only the binary's version and exits                                                                        | _empty_       |
-| `loglevel` | ./radicle-webhooks-adapter --loglevel debug | Set the log level of the application.<br>(`debug`, `info`, `warn`, `error`)<br/>Overrides the Env Var `LOG_LEVEL` | "info"        |
+| Argument   | Example                                           | Description                                                                                                       | Default Value |
+|------------|---------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|---------------|
+| `version`  | ./radicle-github-actions-adapter --version        | Prints only the binary's version and exits                                                                        | _empty_       |
+| `loglevel` | ./radicle-github-actions-adapter --loglevel debug | Set the log level of the application.<br>(`debug`, `info`, `warn`, `error`)<br/>Overrides the Env Var `LOG_LEVEL` | "info"        |
 
 ### Adapter Input - Output
 

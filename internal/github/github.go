@@ -26,7 +26,12 @@ type ActionsService interface {
 }
 
 func NewGitHub(pat string, logger *slog.Logger) *GitHub {
-	ghClient := github.NewClient(nil).WithAuthToken(pat)
+	ghClient := &github.Client{}
+	if len(pat) == 0 {
+		ghClient = github.NewClient(nil)
+	} else {
+		ghClient = github.NewClient(nil).WithAuthToken(pat)
+	}
 	return &GitHub{
 		logger:  logger,
 		repos:   ghClient.Repositories,
