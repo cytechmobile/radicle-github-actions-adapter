@@ -231,7 +231,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutSecs: 10,
+						WorkflowsPollTimoutMins: 10,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -254,7 +254,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutSecs: 10,
+						WorkflowsPollTimoutMins: 10,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -277,7 +277,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutSecs: 10,
+						WorkflowsPollTimoutMins: 10,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -301,7 +301,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutSecs: 10,
+						WorkflowsPollTimoutMins: 10,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -324,7 +324,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutSecs: 10,
+						WorkflowsPollTimoutMins: 10,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -347,7 +347,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutSecs: 10,
+						WorkflowsPollTimoutMins: 10,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -370,7 +370,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutSecs: 10,
+						WorkflowsPollTimoutMins: 10,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},

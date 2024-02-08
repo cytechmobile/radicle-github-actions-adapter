@@ -15,7 +15,7 @@ import (
 type AppConfig struct {
 	RadicleHome             string
 	GitHubPAT               string
-	WorkflowsPollTimoutSecs uint64
+	WorkflowsPollTimoutMins uint64
 	RadicleHttpdURL         string
 	RadicleSessionToken     string
 }
@@ -182,7 +182,7 @@ func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 			}
 		}
 		if !workflowsCompleted {
-			if waitDuration >= time.Second*time.Duration(gas.App.Config.WorkflowsPollTimoutSecs) {
+			if waitDuration >= time.Second*time.Duration(gas.App.Config.WorkflowsPollTimoutMins) {
 				gas.App.Logger.Warn("reached timeout while waiting for workflows to complete")
 				break
 			}

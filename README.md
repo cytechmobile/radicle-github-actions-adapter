@@ -34,10 +34,11 @@ value for each one of them:
 | `RAD_HOME`                    | Path for radicle home directory.                                             | "~/.radicle"            |
 | `RAD_HTTPD_URL`               | Public URL of radicle's HTTPD.                                               | "http://127.0.0.1:8080" |
 | `RAD_SESSION_TOKEN`           | Session token for accessing Radicle API.                                     | ""                      |
-| `GITHUB_PAT`                  | Personal access token for GitHub                                             | ""                      |
-| `WORKFLOWS_POLL_TIMEOUT_SECS` | Timout for polling for workflows completion                                  | 600                     |
+| `GITHUB_PAT`                  | Personal access token for GitHub.                                            | ""                      |
+| `WORKFLOWS_POLL_TIMEOUT_MINS` | Polling timeout for workflows completion.                                    | 30                      |
 
-> `GITHUB_PAT` should have at least read access for the repo and the actions.
+> `GITHUB_PAT` should have at least read access for the repo and the actions/workflows. Please check Github's [rate 
+> limiting policy](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api) 
  
 ### Running the application
 
