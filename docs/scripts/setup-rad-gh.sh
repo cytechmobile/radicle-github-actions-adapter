@@ -1,7 +1,7 @@
 #!/bin/bash
 # Sets up a repo fot the Radicle Github Actions Adapter
 # usage:
-# ./setup-rad-gh-remotes.sh
+# ./setup-rad-gh.sh
 
 set -e
 
@@ -31,8 +31,12 @@ mkdir -p .radicle
 echo "github_username: $workspace_name
 github_repo: $repo_name" > .radicle/github-action.yaml
 
-printf "\n${GREEN}Updating git remote.${NC}\n"
+printf "\n${GREEN}Updating git remote both.${NC}\n"
+set +e
+git remote remove both
+set -e
 REPO_ID=$(rad .)
+REPO_ID=${REPO_ID#"rad:"}
 NODE_ID=$(rad self --nid)
 git remote add both rad://$REPO_ID
 git remote set-url --push both https://github.com/$workspace_name/$repo_name.git

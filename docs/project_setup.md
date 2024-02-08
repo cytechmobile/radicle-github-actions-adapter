@@ -11,8 +11,9 @@ repo about the Github Repository (workspace & repo name). We must also be able t
 Radicle forge and the Github forge at the same time.
 
 This can be done manually by following the manual steps bellow or by using the script provided with
+
 ```bash
-scripts/setup-rad-gh-remotes.sh
+./scripts/setup-rad-gh.sh
 ```
 
 The script must be run within the repository that we want to set it up.
@@ -28,6 +29,7 @@ The content of the file should be:
 github_username: user
 github_repo: repo_name
 ```
+
 ### Repo setup
 
 The repository/project must be setup in a way that each update on the forge should update **both** GitHub and
@@ -81,12 +83,6 @@ Now every push should be done to using `both` remote. So pushing a commit should
 git push both main
 ```
 
-It is crucial to update the Github Repo before it updates the rad repo. The reason for this is that when the rad 
-repo is updated the Radicle CI Broker will receive a Node event and trigger the Github Actions Adapter. The adapter 
-will try to find the specific commit at the Github repo which might fail if the commit hasn't still been pushed to 
-the Github.
-
-
 ### Opening a patch
 
 In order to open a patch to radicle and get the results from the GitHub Actions workflows the refs must be pushed to 
@@ -99,17 +95,20 @@ git checkout -b new-feature-x
 ```
 
 * Do your changes and commit them
+
 ```bash
 git add .
 git commit -m 'Implemented feature X'
 ```
 
 * Push to both remotes
+
 ```bash
 git push both new-feature-x
 ```
 
 * Open the path at Radicle and wait for the workflows' results to appear
+
 ```bash
 git push rad -o patch.message="Implemented feature X" HEAD:refs/patches
 ```

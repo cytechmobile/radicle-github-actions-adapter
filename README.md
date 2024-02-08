@@ -7,8 +7,8 @@ results from GitHub Actions that are executed for each push.
 
 ### Repository Setup
 
-The steps for setting up a repository that automatically updates both GitHub and radicle for all changes can be 
-found at [docs/multi_forge_project_setup.md](docs/multi_forge_project_setup.md).
+The steps for setting up a repository that works with the Radicle GitHub Actions Adapter can be found at 
+[docs/project_setup.md](docs/project_setup.md).
 
 ## Getting Started
 
