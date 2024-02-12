@@ -67,7 +67,7 @@ func (r *Radicle) request(ctx context.Context, rawurl, method string, headers ma
 	in interface{}) error {
 	uri, err := url.Parse(rawurl)
 	if err != nil {
-		r.logger.Error(err.Error())
+		r.logger.Error("could not parse URL", "error", err.Error())
 		return err
 	}
 
@@ -77,7 +77,7 @@ func (r *Radicle) request(ctx context.Context, rawurl, method string, headers ma
 		buf = new(bytes.Buffer)
 		err := json.NewEncoder(buf).Encode(in)
 		if err != nil {
-			r.logger.Error(err.Error())
+			r.logger.Error("could not encode request payload", "error", err.Error())
 			return err
 		}
 	}
@@ -85,7 +85,7 @@ func (r *Radicle) request(ctx context.Context, rawurl, method string, headers ma
 	// create a new http request.
 	req, err := http.NewRequestWithContext(ctx, method, uri.String(), buf)
 	if err != nil {
-		r.logger.Error(err.Error())
+		r.logger.Error("could not invoke request", "error", err.Error())
 		return err
 	}
 	for headerKey, headerVal := range headers {
@@ -94,7 +94,7 @@ func (r *Radicle) request(ctx context.Context, rawurl, method string, headers ma
 
 	resp, err := r.client.Do(req)
 	if err != nil {
-		r.logger.Error(err.Error())
+		r.logger.Error("could not make request", "error", err.Error())
 		return err
 	}
 	defer resp.Body.Close()

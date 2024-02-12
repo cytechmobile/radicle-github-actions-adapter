@@ -1,6 +1,9 @@
 package broker
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 type RequestMessageType string
 
@@ -19,6 +22,11 @@ type RequestMessage struct {
 	Commit     string                    `json:"commit"`
 	PushEvent  *RequestPushEventMessage  `json:"push_event"`
 	PatchEvent *RequestPatchEventMessage `json:"patch_event"`
+}
+
+func (rm *RequestMessage) String() string {
+	return fmt.Sprintf("RequestMessage{Repo:%+v, Commit:%+v, PushEvent:%+v, PatchEvent:%+v}", rm.Repo, rm.Commit,
+		*rm.PushEvent, *rm.PatchEvent)
 }
 
 type RequestPushEventMessage struct {

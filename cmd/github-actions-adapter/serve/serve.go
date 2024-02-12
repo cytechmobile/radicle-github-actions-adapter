@@ -52,10 +52,10 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	gas.App.Logger.Info("serving event", app.EventUUIDKey.String(), eventUUID)
 	brokerRequestMessage, err := gas.Broker.ParseRequestMessage(ctx)
 	if err != nil {
-		gas.App.Logger.Error(err.Error())
+		gas.App.Logger.Error("could not parse broker request message", "error", err.Error())
 		return err
 	}
-	gas.App.Logger.Debug("received message type", "message", fmt.Sprintf("%+v", *brokerRequestMessage))
+	gas.App.Logger.Debug("serving message type", "message", *brokerRequestMessage)
 	jobResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseTriggered,
 		RunID: &broker.RunID{
@@ -65,7 +65,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", jobResponse))
 	err = gas.Broker.ServeResponse(ctx, jobResponse)
 	if err != nil {
-		gas.App.Logger.Error(err.Error())
+		gas.App.Logger.Error("could not send response message to broker", "error", err.Error())
 		return err
 	}
 	repoCommitWorkflowSetup, err := gas.GitHubActions.GetRepoCommitWorkflowSetup(ctx, brokerRequestMessage.Repo,
@@ -121,7 +121,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", resultResponse))
 	err = gas.Broker.ServeResponse(ctx, resultResponse)
 	if err != nil {
-		gas.App.Logger.Error(err.Error())
+		gas.App.Logger.Error("could not send response message to broker", "error", err.Error())
 		return err
 	}
 	return nil

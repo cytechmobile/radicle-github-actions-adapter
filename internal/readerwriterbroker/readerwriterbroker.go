@@ -33,6 +33,7 @@ func (sb *ReaderWriterBroker) ParseRequestMessage(ctx context.Context) (*broker.
 		return nil, err
 	}
 	input = []byte(strings.ReplaceAll(string(input), "\n", ""))
+	sb.logger.Debug("received message from broker", "message", string(input))
 	messageType, err := sb.parseRequestMessageType(input)
 	if err != nil {
 		sb.logger.Error("could not parse request message", "error", err.Error())

@@ -67,7 +67,7 @@ func main() {
 
 	err = run(logger)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Error("could not run radicle-github-actions-adapter", "error", err.Error())
 		os.Exit(1)
 	}
 	logger.Info("radicle-github-actions-adapter terminated successfully")
