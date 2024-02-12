@@ -21,6 +21,8 @@ import (
 	"strings"
 )
 
+var eventUUID = uuid.New().String()
+
 func main() {
 	envLogLevel := env.GetString("LOG_LEVEL", "info")
 	logLevel := flag.String("loglevel", envLogLevel, "Log level: debug, info, warn, error")
@@ -56,15 +58,28 @@ func main() {
 	if slogLevel == slog.LevelDebug {
 		slogHandlerOptions.AddSource = true
 	}
-	logger := slog.New(slog.NewJSONHandler(os.Stderr, &slogHandlerOptions))
 
+	var logHandler slog.Handler
+	logHandler = slog.NewJSONHandler(os.Stderr, &slogHandlerOptions)
+	logHandler = HandlerWithTraceID{logHandler}
+	logger := slog.New(logHandler)
 	slog.SetDefault(logger)
+
 	err = run(logger)
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
 	logger.Info("radicle-github-actions-adapter terminated successfully")
+}
+
+type HandlerWithTraceID struct {
+	slog.Handler
+}
+
+func (h HandlerWithTraceID) Handle(ctx context.Context, r slog.Record) error {
+	r.Add("trace_id", slog.StringValue(eventUUID))
+	return h.Handler.Handle(ctx, r)
 }
 
 func run(logger *slog.Logger) error {
@@ -89,6 +104,10 @@ func run(logger *slog.Logger) error {
 	var application serve.App
 	application.Config = cfg
 	application.Logger = logger
+
+	ctx := context.WithValue(context.Background(), app.EventUUIDKey, eventUUID)
+	ctx = context.WithValue(ctx, app.RepoClonePathKey, eventUUID)
+	
 	logger.Info("radicle-github-actions-adapter is starting", "version", version.Get())
 	radicleBroker := readerwriterbroker.NewReaderWriterBroker(os.Stdin, os.Stdout, logger)
 	gitOps := git.NewGit(logger)
@@ -97,9 +116,6 @@ func run(logger *slog.Logger) error {
 	radiclePatch := radicle.NewRadicle(cfg.RadicleHttpdURL, cfg.RadicleSessionToken, logger)
 	srv := serve.NewGitHubActionsServer(&application, radicleBroker, gitHubActions, radiclePatch)
 
-	eventUUID := uuid.New().String()
-	ctx := context.WithValue(context.Background(), app.EventUUIDKey, eventUUID)
-	ctx = context.WithValue(ctx, app.RepoClonePathKey, eventUUID)
 	defer func() {
 		if r := recover(); r != nil {
 			err := fmt.Errorf("%+v", r)
