@@ -73,6 +73,10 @@ func run(logger *slog.Logger) error {
 	cfg.RadicleHttpdURL = env.GetString("RAD_HTTPD_URL", "http://127.0.0.1:8080")
 	cfg.RadicleSessionToken = env.GetString("RAD_SESSION_TOKEN", "")
 	cfg.GitHubPAT = env.GetString("GITHUB_PAT", "")
+	cfg.WorkflowsStartLagSecs = env.GetUint64("WORKFLOWS_START_LAG_SECS", 60)
+	if cfg.WorkflowsStartLagSecs == 0 {
+		cfg.WorkflowsStartLagSecs = 60
+	}
 	cfg.WorkflowsPollTimoutMins = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_MINS", 30)
 	if cfg.WorkflowsPollTimoutMins == 0 {
 		cfg.WorkflowsPollTimoutMins = 30

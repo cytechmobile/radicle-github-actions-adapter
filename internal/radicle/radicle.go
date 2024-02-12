@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"radicle-github-actions-adapter/app/radicle"
+	"strconv"
 )
 
 const patchURL string = "%s/api/v1/projects/%s/patches/%s"
@@ -55,15 +56,11 @@ type HttpError struct {
 }
 
 func (e HttpError) Error() string {
-	return e.Body.Message
-}
-
-type HttpRequestError struct {
-	Message string
-}
-
-func (e HttpRequestError) Error() string {
-	return e.Message
+	statusCode := ""
+	if e.Status != 0 {
+		statusCode = "HTTP" + strconv.Itoa(e.Status) + " "
+	}
+	return statusCode + e.Body.Message
 }
 
 func (r *Radicle) request(ctx context.Context, rawurl, method string, headers map[string]string,
@@ -104,11 +101,11 @@ func (r *Radicle) request(ctx context.Context, rawurl, method string, headers ma
 
 	// if an error is encountered, parse and return the error response.
 	if resp.StatusCode >= http.StatusBadRequest {
-		r.logger.Error("request responded with error", "status code", resp.StatusCode)
+		r.logger.Error("request responded with error code", "status code", resp.StatusCode)
 		err := HttpError{}
-		_ = json.NewDecoder(resp.Body).Decode(&err)
+		_ = json.NewDecoder(resp.Body).Decode(&err.Body.Message)
 		err.Status = resp.StatusCode
-		r.logger.Error("request responded with error", "message", err.Body.Message)
+		r.logger.Error("request responded with error message", "message", err.Body.Message)
 		return err
 	}
 

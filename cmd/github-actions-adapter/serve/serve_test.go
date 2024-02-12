@@ -3,6 +3,7 @@ package serve
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"os"
 	"radicle-github-actions-adapter/app"
@@ -182,14 +183,19 @@ func (g *MockGitHubActions) GetRepoCommitWorkflowsResults(ctx context.Context, g
 	return workflowResults, nil
 }
 
-type MockRadiclePatch struct{}
+type MockRadiclePatch struct {
+	TotalComments int
+	t             *testing.T
+}
 
 func (p *MockRadiclePatch) Comment(ctx context.Context, repoID, patchID, revisionID string, message string) error {
 	eventUUID := ctx.Value(app.EventUUIDKey).(string)
 	if strings.Contains(eventUUID, "invalid") {
+		p.t.Error("unknown error")
 		return errors.New("unknown error")
 	}
 	if repoID != "repo_id" {
+		p.t.Error("invalid data")
 		return errors.New("invalid data")
 	}
 	totalWorkflowsString := eventUUID[len(eventUUID)-1:]
@@ -198,17 +204,24 @@ func (p *MockRadiclePatch) Comment(ctx context.Context, repoID, patchID, revisio
 		return err
 	}
 
-	if totalWorkflows != strings.Count(message, "<a href") {
-		return errors.New("total workflows do not match message")
+	if !strings.Contains(message, "Checking") {
+		if totalWorkflows != strings.Count(message, "<a href") {
+			p.t.Error("total workflows do not match message")
+			return errors.New("total workflows do not match message")
+		}
 	}
-
+	p.TotalComments--
+	if p.TotalComments < 0 {
+		p.t.Error("too much comments requested in total")
+		return errors.New("too much comments requested in total")
+	}
+	fmt.Println(p.TotalComments)
 	return nil
 }
 
 func TestGitHubActions_Serve(t *testing.T) {
 	mockBroker := MockBroker{}
 	mockGitHubActions := MockGitHubActions{}
-	mockRadicle := MockRadiclePatch{}
 	type fields struct {
 		App           *App
 		Broker        broker.Broker
@@ -231,7 +244,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutMins: 10,
+						WorkflowsPollTimoutMins: 1,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -239,7 +252,10 @@ func TestGitHubActions_Serve(t *testing.T) {
 				},
 				Broker:        &mockBroker,
 				GitHubActions: &mockGitHubActions,
-				Radicle:       &mockRadicle,
+				Radicle: &MockRadiclePatch{
+					TotalComments: 0,
+					t:             t,
+				},
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
@@ -254,7 +270,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutMins: 10,
+						WorkflowsPollTimoutMins: 1,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -262,7 +278,10 @@ func TestGitHubActions_Serve(t *testing.T) {
 				},
 				Broker:        &mockBroker,
 				GitHubActions: &mockGitHubActions,
-				Radicle:       &mockRadicle,
+				Radicle: &MockRadiclePatch{
+					TotalComments: 0,
+					t:             t,
+				},
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
@@ -277,7 +296,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutMins: 10,
+						WorkflowsPollTimoutMins: 1,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -285,7 +304,10 @@ func TestGitHubActions_Serve(t *testing.T) {
 				},
 				Broker:        &mockBroker,
 				GitHubActions: &mockGitHubActions,
-				Radicle:       &mockRadicle,
+				Radicle: &MockRadiclePatch{
+					TotalComments: 0,
+					t:             t,
+				},
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
@@ -293,7 +315,6 @@ func TestGitHubActions_Serve(t *testing.T) {
 			},
 			wantErr: true,
 		},
-
 		{
 			name: "Serve fails when broker message is invalid",
 			fields: fields{
@@ -301,7 +322,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutMins: 10,
+						WorkflowsPollTimoutMins: 1,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -309,7 +330,10 @@ func TestGitHubActions_Serve(t *testing.T) {
 				},
 				Broker:        &mockBroker,
 				GitHubActions: &mockGitHubActions,
-				Radicle:       &mockRadicle,
+				Radicle: &MockRadiclePatch{
+					TotalComments: 0,
+					t:             t,
+				},
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
@@ -324,7 +348,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutMins: 10,
+						WorkflowsPollTimoutMins: 1,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -332,7 +356,10 @@ func TestGitHubActions_Serve(t *testing.T) {
 				},
 				Broker:        &mockBroker,
 				GitHubActions: &mockGitHubActions,
-				Radicle:       &mockRadicle,
+				Radicle: &MockRadiclePatch{
+					TotalComments: 3,
+					t:             t,
+				},
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
@@ -347,7 +374,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutMins: 10,
+						WorkflowsPollTimoutMins: 1,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -355,7 +382,10 @@ func TestGitHubActions_Serve(t *testing.T) {
 				},
 				Broker:        &mockBroker,
 				GitHubActions: &mockGitHubActions,
-				Radicle:       &mockRadicle,
+				Radicle: &MockRadiclePatch{
+					TotalComments: 3,
+					t:             t,
+				},
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
@@ -370,7 +400,7 @@ func TestGitHubActions_Serve(t *testing.T) {
 					Config: AppConfig{
 						RadicleHome:             ".radicle/",
 						GitHubPAT:               "github_path",
-						WorkflowsPollTimoutMins: 10,
+						WorkflowsPollTimoutMins: 1,
 						RadicleHttpdURL:         "http://radicle.url",
 						RadicleSessionToken:     "rad_session_id",
 					},
@@ -378,7 +408,10 @@ func TestGitHubActions_Serve(t *testing.T) {
 				},
 				Broker:        &mockBroker,
 				GitHubActions: &mockGitHubActions,
-				Radicle:       &mockRadicle,
+				Radicle: &MockRadiclePatch{
+					TotalComments: 0,
+					t:             t,
+				},
 			},
 			args: args{
 				ctx: context.WithValue(context.WithValue(context.Background(), app.EventUUIDKey,
@@ -453,7 +486,7 @@ func TestGitHubActions_PreparePatchCommentMessage(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := gas.preparePatchCommentMessage(tc.response, githubActionsSettings)
+			result := gas.preparePatchCommentResultMessage(tc.response, githubActionsSettings)
 			if result != tc.expected {
 				t.Fatalf("expected %s, but got %s", tc.expected, result)
 			}
