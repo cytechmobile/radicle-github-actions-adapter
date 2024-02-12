@@ -4,7 +4,7 @@ resources:
     type: git
     icon: git
     source:
-      uri: https://radicle.yorgos.net.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
+      uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
       git_config:
       - name: safe.directory
         value: /tmp/build/get
