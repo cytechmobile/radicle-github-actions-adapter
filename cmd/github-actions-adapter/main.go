@@ -77,13 +77,13 @@ func run(logger *slog.Logger) error {
 	if cfg.WorkflowsStartLagSecs == 0 {
 		cfg.WorkflowsStartLagSecs = 60
 	}
-	cfg.WorkflowsPollTimoutMins = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_MINS", 30)
-	if cfg.WorkflowsPollTimoutMins == 0 {
-		cfg.WorkflowsPollTimoutMins = 30
+	cfg.WorkflowsPollTimoutSecs = env.GetUint64("WORKFLOWS_POLL_TIMEOUT_SECS", 30*60)
+	if cfg.WorkflowsPollTimoutSecs == 0 {
+		cfg.WorkflowsPollTimoutSecs = 30 * 60
 	}
 
 	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome, "RadicleHttpdURL", cfg.RadicleHttpdURL,
-		"RadicleSessionToken", cfg.RadicleSessionToken, "WorkflowsPollTimoutMins", cfg.WorkflowsPollTimoutMins,
+		"RadicleSessionToken", cfg.RadicleSessionToken, "WorkflowsPollTimoutSecs", cfg.WorkflowsPollTimoutSecs,
 		"GitHubPAT length", len(cfg.GitHubPAT))
 
 	var application serve.App

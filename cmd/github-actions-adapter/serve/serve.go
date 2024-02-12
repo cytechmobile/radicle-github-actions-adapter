@@ -15,7 +15,7 @@ type AppConfig struct {
 	RadicleHome             string
 	GitHubPAT               string
 	WorkflowsStartLagSecs   uint64
-	WorkflowsPollTimoutMins uint64
+	WorkflowsPollTimoutSecs uint64
 	RadicleHttpdURL         string
 	RadicleSessionToken     string
 }
@@ -160,8 +160,7 @@ func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 	WorkflowResult, error) {
 	var workflowsResult []app.WorkflowResult
 	var err error
-	for start := time.Now(); time.Since(start) < time.Minute*time.Duration(gas.App.Config.WorkflowsPollTimoutMins); {
-		time.Sleep(app.WorkflowCheckInterval)
+	for start := time.Now(); time.Since(start) < time.Minute*time.Duration(gas.App.Config.WorkflowsPollTimoutSecs); {
 		workflowsCompleted := true
 		workflowsResult, err = gas.GitHubActions.GetRepoCommitWorkflowsResults(ctx, repoCommitWorkflowSetup.GitHubUsername,
 			repoCommitWorkflowSetup.GitHubRepo, brokerRequestMessage.Commit)
@@ -180,6 +179,7 @@ func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 			gas.App.Logger.Info("all workflows execution complete")
 			break
 		}
+		time.Sleep(app.WorkflowCheckInterval)
 	}
 	return workflowsResult, nil
 }

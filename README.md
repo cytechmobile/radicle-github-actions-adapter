@@ -36,7 +36,7 @@ value for each one of them:
 | `RAD_SESSION_TOKEN`           | Session token for accessing Radicle API.                                     | ""                      |
 | `GITHUB_PAT`                  | Personal access token for GitHub.                                            | ""                      |
 | `WORKFLOWS_START_LAG_SECS`    | Lag time before giving up checking for Github's commit and workflows.        | 60                      |
-| `WORKFLOWS_POLL_TIMEOUT_MINS` | Polling timeout for workflows completion.                                    | 30                      |
+| `WORKFLOWS_POLL_TIMEOUT_SECS` | Polling timeout for workflows completion.                                    | 1800                    |
 
 > `GITHUB_PAT` should have at least read access for the repo and the actions/workflows. Please check Github's [rate 
 > limiting policy](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api) 
