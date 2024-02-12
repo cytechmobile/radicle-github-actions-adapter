@@ -98,8 +98,8 @@ func run(logger *slog.Logger) error {
 	}
 
 	logger.Debug("starting with configuration", "RadicleHome", cfg.RadicleHome, "RadicleHttpdURL", cfg.RadicleHttpdURL,
-		"RadicleSessionToken", cfg.RadicleSessionToken, "WorkflowsPollTimoutSecs", cfg.WorkflowsPollTimoutSecs,
-		"GitHubPAT length", len(cfg.GitHubPAT))
+		"RadicleSessionToken length", len(cfg.RadicleSessionToken), "WorkflowsPollTimoutSecs",
+		cfg.WorkflowsPollTimoutSecs, "GitHubPAT length", len(cfg.GitHubPAT))
 
 	var application serve.App
 	application.Config = cfg
@@ -107,7 +107,7 @@ func run(logger *slog.Logger) error {
 
 	ctx := context.WithValue(context.Background(), app.EventUUIDKey, eventUUID)
 	ctx = context.WithValue(ctx, app.RepoClonePathKey, eventUUID)
-	
+
 	logger.Info("radicle-github-actions-adapter is starting", "version", version.Get())
 	radicleBroker := readerwriterbroker.NewReaderWriterBroker(os.Stdin, os.Stdout, logger)
 	gitOps := git.NewGit(logger)
