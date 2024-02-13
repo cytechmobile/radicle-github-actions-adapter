@@ -464,7 +464,7 @@ func TestGitHubActions_PreparePatchCommentMessage(t *testing.T) {
 					{WorkflowID: "2", WorkflowName: "UnitTests", WorkflowResult: githubops.WorkflowResultFailure},
 				},
 			},
-			expected: "Github Actions Result: success ✅\n\nDetails:\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/1\" target=\"_blank\" >BuildTest (1)</a>: success 🟢\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/2\" target=\"_blank\" >UnitTests (2)</a>: failure 🔴",
+			expected: "GitHub Actions Result: success ✅\n\nDetails:\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/1\" target=\"_blank\" >BuildTest (1)</a>: success 🟢\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/2\" target=\"_blank\" >UnitTests (2)</a>: failure 🔴",
 		},
 		{
 			name: "PreparePatchCommentMessage is successful using only failed results",
@@ -475,7 +475,7 @@ func TestGitHubActions_PreparePatchCommentMessage(t *testing.T) {
 					{WorkflowID: "2", WorkflowName: "UnitTests", WorkflowResult: githubops.WorkflowResultFailure},
 				},
 			},
-			expected: "Github Actions Result: failure ❌\n\nDetails:\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/1\" target=\"_blank\" >BuildTest (1)</a>: success 🟢\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/2\" target=\"_blank\" >UnitTests (2)</a>: failure 🔴",
+			expected: "GitHub Actions Result: failure ❌\n\nDetails:\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/1\" target=\"_blank\" >BuildTest (1)</a>: success 🟢\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/2\" target=\"_blank\" >UnitTests (2)</a>: failure 🔴",
 		},
 		{
 			name: "PreparePatchCommentMessage is successful using mixed results",
@@ -487,7 +487,7 @@ func TestGitHubActions_PreparePatchCommentMessage(t *testing.T) {
 					{WorkflowID: "3", WorkflowName: "IntegrationTests", WorkflowResult: "otherResult"},
 				},
 			},
-			expected: "Github Actions Result: failure ❌\n\nDetails:\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/1\" target=\"_blank\" >BuildTest (1)</a>: success 🟢\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/2\" target=\"_blank\" >UnitTests (2)</a>: failure 🔴\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/3\" target=\"_blank\" >IntegrationTests (3)</a>: otherResult 🟡",
+			expected: "GitHub Actions Result: failure ❌\n\nDetails:\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/1\" target=\"_blank\" >BuildTest (1)</a>: success 🟢\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/2\" target=\"_blank\" >UnitTests (2)</a>: failure 🔴\n\n - <a href=\"https://github.com/testUser/testRepo/actions/runs/3\" target=\"_blank\" >IntegrationTests (3)</a>: otherResult 🟡",
 		},
 	}
 

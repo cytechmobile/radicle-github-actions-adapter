@@ -6,9 +6,9 @@ will inform back the broker with any results and also update any patch using com
 
 ## Project Setup
 
-In order to setup a project/repository to work with the Radicle Github Adapter we must add some metadata within the 
-repo about the Github Repository (workspace & repo name). We must also be able to push any change to both the 
-Radicle forge and the Github forge at the same time.
+In order to setup a project/repository to work with the Radicle GitHub Adapter we must add some metadata within the 
+repo about the GitHub Repository (workspace & repo name). We must also be able to push any change to both the 
+Radicle forge and the GitHub forge at the same time.
 
 This can be done manually by following the manual steps bellow or by using the script provided with
 
