@@ -35,14 +35,14 @@ value for each one of them:
 | `RAD_HTTPD_URL`               | Public URL of radicle's HTTPD.                                               | "http://127.0.0.1:8080" |
 | `RAD_SESSION_TOKEN`           | Session token for accessing Radicle API.                                     | ""                      |
 | `GITHUB_PAT`                  | Personal access token for GitHub.                                            | ""                      |
-| `WORKFLOWS_START_LAG_SECS`    | Lag time before giving up checking for Github's commit and workflows.        | 60                      |
+| `WORKFLOWS_START_LAG_SECS`    | Lag time before giving up checking for GitHub's commit and workflows.        | 60                      |
 | `WORKFLOWS_POLL_TIMEOUT_SECS` | Polling timeout for workflows completion.                                    | 1800                    |
 
-> `GITHUB_PAT` should have at least read access for the repo and the actions/workflows. Please check Github's [rate 
+> `GITHUB_PAT` should have at least read access for the repo and the actions/workflows. Please check GitHub's [rate 
 > limiting policy](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api) 
  
 > `WORKFLOWS_START_LAG_SECS` is a necessary lag time as it is possible to push first to the radicle forge and then to 
-> Github. This would generate an error as the adapter won't be able to find the commit at Github or the workflows 
+> GitHub. This would generate an error as the adapter won't be able to find the commit at GitHub or the workflows 
 > might have not been spawned.  
  
 ### Running the application

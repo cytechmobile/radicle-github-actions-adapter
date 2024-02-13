@@ -55,7 +55,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		gas.App.Logger.Error("could not parse broker request message", "error", err.Error())
 		return err
 	}
-	gas.App.Logger.Debug("serving message type", "message", *brokerRequestMessage)
+	gas.App.Logger.Debug("serving broker message", "message", *brokerRequestMessage)
 	jobResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseTriggered,
 		RunID: &broker.RunID{
@@ -79,15 +79,12 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		Result:   app.BrokerResultSuccess,
 	}
 	if repoCommitWorkflowSetup != nil {
-		// Write 1st comment that we check Github for workflows
+		// Write 1st comment that we check GitHub for workflows
 		if brokerRequestMessage.PatchEvent != nil {
 			commentMessage := gas.preparePatchCommentStartMessage(resultResponse, *repoCommitWorkflowSetup)
-			err = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
-			if err != nil {
-				gas.App.Logger.Warn("could not comment on patch", "error", err.Error())
-			}
+			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
 		}
-		// Find Github Workflows
+		// Find GitHub Workflows
 		workflowsResult, err := gas.checkRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
 		if err != nil {
 			gas.App.Logger.Error("could not check for github workflows")
@@ -97,13 +94,10 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 			detailsResponse := resultResponse
 			gas.updateResponseResults(&detailsResponse, workflowsResult)
 			commentMessage := gas.preparePatchCommentInfoMessage(detailsResponse, *repoCommitWorkflowSetup)
-			err = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
-			if err != nil {
-				gas.App.Logger.Warn("could not comment on patch", "error", err.Error())
-			}
+			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
 		}
 
-		//Wait for Github Workflows results and write comment
+		//Wait for GitHub Workflows results and write comment
 		workflowsResult, err = gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
 		if err != nil {
 			gas.App.Logger.Error("failed waiting for github workflows")
@@ -112,10 +106,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 		gas.updateResponseResults(&resultResponse, workflowsResult)
 		if brokerRequestMessage.PatchEvent != nil {
 			commentMessage := gas.preparePatchCommentResultMessage(resultResponse, *repoCommitWorkflowSetup)
-			err = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
-			if err != nil {
-				gas.App.Logger.Warn("could not comment on patch", "error", err.Error())
-			}
+			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
 		}
 	}
 	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", resultResponse))

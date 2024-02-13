@@ -1,5 +1,5 @@
 #!/bin/bash
-# Sets up a repo fot the Radicle Github Actions Adapter
+# Sets up a repo fot the Radicle GitHub Actions Adapter
 # usage:
 # ./setup-rad-gh.sh
 
@@ -19,11 +19,11 @@ if [ $? -ne 0 ]; then
 fi
 }
 
-printf "\n${GREEN}This script will setup the repository for the Radicle Github Actions Adapter.${NC}\n"
+printf "\n${GREEN}This script will setup the repository for the Radicle GitHub Actions Adapter.${NC}\n"
 
-printf "\n${CYAN}    Please provide the Github's workspace name: ${NC}"
+printf "\n${CYAN}    Please provide the GitHub's workspace name: ${NC}"
 read workspace_name
-printf "\n${CYAN}    Please provide the Github's repo name: ${NC}"
+printf "\n${CYAN}    Please provide the GitHub's repo name: ${NC}"
 read repo_name
 
 printf "\n${GREEN}Populating .radicle/github-action.yaml sile.${NC}\n"

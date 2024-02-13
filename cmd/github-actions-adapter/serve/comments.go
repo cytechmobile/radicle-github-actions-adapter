@@ -9,7 +9,7 @@ import (
 	"radicle-github-actions-adapter/app/githubops"
 )
 
-// commentResultOnPatch adds a patch-revision comment with the results of the Github workflows.
+// commentResultOnPatch adds a patch-revision comment with the results of the GitHub workflows.
 func (gas *GitHubActionsServer) commentOnPatch(ctx context.Context,
 	brokerRequestMessage *broker.RequestMessage, commentMessage string) error {
 	if len(brokerRequestMessage.PatchEvent.Patch.Revisions) == 0 {
@@ -17,24 +17,33 @@ func (gas *GitHubActionsServer) commentOnPatch(ctx context.Context,
 		return errors.New("no revision found in patch")
 	}
 	revision := brokerRequestMessage.PatchEvent.Patch.Revisions[len(brokerRequestMessage.PatchEvent.Patch.Revisions)-1]
-	return gas.Radicle.Comment(ctx, brokerRequestMessage.Repo, brokerRequestMessage.PatchEvent.Patch.ID, revision.ID,
+	err := gas.Radicle.Comment(ctx, brokerRequestMessage.Repo, brokerRequestMessage.PatchEvent.Patch.ID, revision.ID,
 		commentMessage)
+	if err != nil {
+		gas.App.Logger.Warn("could not comment on patch", "content", commentMessage, "patch_id",
+			brokerRequestMessage.PatchEvent.Patch.ID, "revision_id", revision.ID, "error", err.Error())
+		return err
+	}
+	gas.App.Logger.Debug("successfully added patch comment", "content", commentMessage, "patch_id",
+		brokerRequestMessage.PatchEvent.Patch.ID, "revision_id", revision.ID)
+	return nil
+
 }
 
 // preparePatchCommentStartMessage prepares a message for adding as patch comment with information about starting to
-// check for Github workflows.
+// check for GitHub workflows.
 func (gas *GitHubActionsServer) preparePatchCommentStartMessage(resultResponse broker.ResponseMessage,
 	gitHubActionsSettings app.GitHubActionsSettings) string {
-	commentMessage := "Checking for Github Actions Workflows."
+	commentMessage := "Checking for GitHub Actions Workflows."
 	return commentMessage
 }
 
-// preparePatchCommentInfoMessage prepares a message for adding as patch comment with information about the Github
+// preparePatchCommentInfoMessage prepares a message for adding as patch comment with information about the GitHub
 // workflows.
 func (gas *GitHubActionsServer) preparePatchCommentInfoMessage(resultResponse broker.ResponseMessage,
 	gitHubActionsSettings app.GitHubActionsSettings) string {
 	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
-	commentMessage := "Github Actions Workflows 🟧"
+	commentMessage := "GitHub Actions Workflows 🟧"
 
 	commentMessage += "\n\nWorkflows:"
 	for _, result := range resultResponse.ResultDetails {
@@ -50,7 +59,7 @@ func (gas *GitHubActionsServer) preparePatchCommentInfoMessage(resultResponse br
 func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse broker.ResponseMessage,
 	gitHubActionsSettings app.GitHubActionsSettings) string {
 	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
-	commentMessage := "Github Actions Result: " + resultResponse.Result
+	commentMessage := "GitHub Actions Result: " + resultResponse.Result
 	if resultResponse.Result == githubops.WorkflowResultSuccess {
 		commentMessage += " ✅"
 	} else {
