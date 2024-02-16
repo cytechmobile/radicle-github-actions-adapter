@@ -49,7 +49,7 @@ test/cover:
 ## build: build the cmd/rest application
 .PHONY: build
 build:
-	go build -o=/tmp/bin/radicle-github-actions-adapter ./cmd/github-actions-adapter
+	go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=development' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=/tmp/bin/radicle-github-actions-adapter ./cmd/github-actions-adapter
 
 ## run: run the cmd/rest application
 .PHONY: run

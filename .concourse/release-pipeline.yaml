@@ -6,6 +6,7 @@ resources:
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
     branch: main
+    tag_filter: v*
     git_config:
     - name: safe.directory
       value: /tmp/build/get
@@ -65,11 +66,11 @@ jobs:
         - -c
         - |
           cd github-actions-adapter
-          COMMIT_HASH=$(git rev-parse HEAD)
-          env GOOS=linux GOARCH=amd64 go build -o=../binaries/radicle-github-actions-adapter-linux-amd64-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=linux GOARCH=arm64 go build -o=../binaries/radicle-github-actions-adapter-linux-arm64-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=darwin GOARCH=amd64 go build -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=darwin GOARCH=arm64 go build -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$COMMIT_HASH ./cmd/github-actions-adapter
+          GIT_TAG=$(git describe --tags)
+          env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$GIT_TAG' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-amd64-$GIT_TAG  ./cmd/github-actions-adapter
+          env GOOS=linux GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$GIT_TAG' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-arm64-$GIT_TAG ./cmd/github-actions-adapter
+          env GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$GIT_TAG' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$GIT_TAG ./cmd/github-actions-adapter
+          env GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$GIT_TAG' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$GIT_TAG ./cmd/github-actions-adapter
           ls -alh ../binaries 
 
   # push images

@@ -30,7 +30,8 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("version: %s\n", version.Get())
+		fmt.Printf("version: %s, build_time: %s, revision: %s\n", version.GetVersion(), version.GetBuildTime(),
+			version.GetRevision())
 		os.Exit(0)
 	}
 
@@ -108,7 +109,8 @@ func run(logger *slog.Logger) error {
 	ctx := context.WithValue(context.Background(), app.EventUUIDKey, eventUUID)
 	ctx = context.WithValue(ctx, app.RepoClonePathKey, eventUUID)
 
-	logger.Info("radicle-github-actions-adapter is starting", "version", version.Get())
+	logger.Info("radicle-github-actions-adapter is starting", "version", version.GetVersion(),
+		"revision", version.GetRevision(), "build_time", version.GetBuildTime())
 	radicleBroker := readerwriterbroker.NewReaderWriterBroker(os.Stdin, os.Stdout, logger)
 	gitOps := git.NewGit(logger)
 	gitHubOps := github.NewGitHub(cfg.GitHubPAT, logger)

@@ -5,7 +5,10 @@ import (
 	"runtime/debug"
 )
 
-func Get() string {
+var Version = "development"
+var BuildTime = ""
+
+func GetRevision() string {
 	var revision string
 	var modified bool
 	bi, ok := debug.ReadBuildInfo()
@@ -28,4 +31,12 @@ func Get() string {
 		return fmt.Sprintf("%s-dirty", revision)
 	}
 	return revision
+}
+
+func GetVersion() string {
+	return Version
+}
+
+func GetBuildTime() string {
+	return BuildTime
 }
