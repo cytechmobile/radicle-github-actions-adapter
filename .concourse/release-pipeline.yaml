@@ -5,7 +5,6 @@ resources:
   icon: git
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
-    branch: main
     tag_filter: v*
     git_config:
     - name: safe.directory
