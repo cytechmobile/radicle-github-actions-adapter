@@ -42,4 +42,4 @@ git remote add both rad://$REPO_ID
 git remote set-url --push both https://github.com/$workspace_name/$repo_name.git
 git remote set-url --add --push both rad://$REPO_ID/$NODE_ID
 
-printf "\n${GREEN}Setup completed successfully${NC}\n"
+printf "\n${GREEN}Setup completed successfully.${NC}\n"
