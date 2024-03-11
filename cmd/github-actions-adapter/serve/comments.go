@@ -43,14 +43,13 @@ func (gas *GitHubActionsServer) preparePatchCommentStartMessage(resultResponse b
 func (gas *GitHubActionsServer) preparePatchCommentInfoMessage(resultResponse broker.ResponseMessage,
 	gitHubActionsSettings app.GitHubActionsSettings) string {
 	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
-	commentMessage := "GitHub Actions Workflows 🟧"
+	commentMessage := "GitHub Actions Workflows ⏳"
 
 	commentMessage += "\n\nWorkflows:"
 	for _, result := range resultResponse.ResultDetails {
 		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo, result.WorkflowID)
 		commentMessage += "\n\n - "
-		commentMessage += `<a href="` + url + `" target="_blank" >` + result.WorkflowName + " (" + result.
-			WorkflowID + ")</a> 🟠"
+		commentMessage += fmt.Sprintf("[%s (%s)](%s) ⏳", result.WorkflowName, result.WorkflowID, url)
 	}
 	return commentMessage
 }
@@ -60,7 +59,7 @@ func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse 
 	gitHubActionsSettings app.GitHubActionsSettings) string {
 	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
 	commentMessage := "GitHub Actions Result: " + resultResponse.Result
-	if resultResponse.Result == githubops.WorkflowResultSuccess {
+	if resultResponse.Result == app.BrokerResultSuccess {
 		commentMessage += " ✅"
 	} else {
 		commentMessage += " ❌"
@@ -70,14 +69,13 @@ func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse 
 	for _, result := range resultResponse.ResultDetails {
 		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo, result.WorkflowID)
 		commentMessage += "\n\n - "
-		commentMessage += `<a href="` + url + `" target="_blank" >` + result.WorkflowName + " (" + result.
-			WorkflowID + ")</a>: " + result.WorkflowResult
+		commentMessage += fmt.Sprintf("[%s (%s)](%s):", result.WorkflowName, result.WorkflowID, url)
 		if result.WorkflowResult == githubops.WorkflowResultSuccess {
-			commentMessage += " 🟢"
+			commentMessage += " ✅"
 		} else if result.WorkflowResult == githubops.WorkflowResultFailure {
-			commentMessage += " 🔴"
+			commentMessage += " ❌"
 		} else {
-			commentMessage += " 🟡"
+			commentMessage += " ⌛️"
 		}
 	}
 	return commentMessage

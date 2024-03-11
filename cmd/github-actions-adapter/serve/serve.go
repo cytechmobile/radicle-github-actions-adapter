@@ -151,7 +151,7 @@ func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 	WorkflowResult, error) {
 	var workflowsResult []app.WorkflowResult
 	var err error
-	for start := time.Now(); time.Since(start) < time.Minute*time.Duration(gas.App.Config.WorkflowsPollTimoutSecs); {
+	for start := time.Now(); time.Since(start) < time.Second*time.Duration(gas.App.Config.WorkflowsPollTimoutSecs); {
 		workflowsCompleted := true
 		workflowsResult, err = gas.GitHubActions.GetRepoCommitWorkflowsResults(ctx, repoCommitWorkflowSetup.GitHubUsername,
 			repoCommitWorkflowSetup.GitHubRepo, brokerRequestMessage.Commit)

@@ -51,7 +51,7 @@ func (rga *RadicleGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context,
 	}
 
 	githubActionsSetup, err := rga.getRadicleGitHubActionsSetup(repoPath + radicleGitHubActionsSettingsPath)
-	if err != nil || githubActionsSetup == nil {
+	if err != nil {
 		rga.logger.Warn("no GitHub Actions setup found", "reason", err.Error())
 		return nil, nil
 	}

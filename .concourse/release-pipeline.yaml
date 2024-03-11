@@ -53,7 +53,9 @@ jobs:
       platform: linux
       image_resource:
         type: registry-image
-        source: { repository: golang, tag: 1.21.0 }
+        source:
+          repository: golang
+          tag: 1.21.0
 
       inputs:
       - name: github-actions-adapter
@@ -70,7 +72,6 @@ jobs:
           env GOOS=linux GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$GIT_TAG' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-arm64-$GIT_TAG ./cmd/github-actions-adapter
           env GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$GIT_TAG' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$GIT_TAG ./cmd/github-actions-adapter
           env GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$GIT_TAG' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$GIT_TAG ./cmd/github-actions-adapter
-          ls -alh ../binaries 
 
   # push images
   - put: bucket
