@@ -78,11 +78,14 @@ Application binary accepts specific arguments at init time. There are:
 Application uses SemVer version releases withVersion Control System's metadata. In order to specify a binary's version
 it is generated from the revision of the source code and optionally the dirty flag which indicates if the binary
 contains uncommitted changes. Here is an example version output: 
+
 ```
 version: development, build_time: Fri Feb 16 16:53:24 EET 2024, revision: e63d3e19138f7165d11a5d046a1703ba06a69b23-dirty
 ```
+
 A `development` version indicates that the specific build didn't produce from a specific released version.
 Builds that originate from specific released versions contain information like this:
+
 ```
 version: v0.5.1, build_time: Fri Feb 16 16:53:24 EET 2024, revision: e63d3e19138f7165d11a5d046a1703ba06a69b23
 ```
@@ -96,12 +99,14 @@ are exchanges throughout the adapter's runtime:
    `rad:zwTxygwuz5LDGBq255RA2CbNGrz8/tree/doc/architecture.md`
 
 2. Outgoing response message with the job ID:
+
 ```json
 {
     "response": "triggered",
     "run_id": "<RUN-UUID>"
 }
 ```
+
 3. Outgoing response message with the response result:
 
 ```json
@@ -114,6 +119,7 @@ are exchanges throughout the adapter's runtime:
 If at least on job fails the result will be considered as failed.
 
 In case of an unexpected error the following response message is provided
+
 ```json
 {
   "response": "finished",
