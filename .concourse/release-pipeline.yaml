@@ -26,7 +26,7 @@ jobs:
   plan:
   - get: github-actions-adapter
     trigger: true
-    tags: [v*]
+    tags: [v.*]
 
   # test source
   - task: test
