@@ -15,7 +15,7 @@ Check [Changelog Format](#Changelog-Format) for more details about this changelo
 
 ## Changelog Format
 
-Title: **Version (vX.Y.Z) - Date (YYYY-MM-DD)**
+Title: **Version ([vX.Y.Z]) - Date (YYYY-MM-DD)**
 
 Version numbering follows the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) schema.
 You can expect the following sections under each version:
