@@ -5,13 +5,13 @@ Check [Changelog Format](#Changelog-Format) for more details about this changelo
 
 ## [Unreleased]
 
-## [0.5.0] - 2024-02-16
+## [0.5.0] - 2024-03-11
 
 ### Added
 
 - Configure through env vars
-- Support multiple GitHub Actions monitoring
-- Support add comments on patch with information for the GitHub Actions information and results
+- Support multiple GitHub Action workflows monitoring
+- Support add comments on patch with information for the GitHub Actions and results in markdown format
 
 ## Changelog Format
 
