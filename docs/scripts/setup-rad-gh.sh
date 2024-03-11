@@ -33,7 +33,7 @@ github_repo: $repo_name" > .radicle/github-action.yaml
 
 printf "\n${GREEN}Updating git remote both.${NC}\n"
 set +e
-git remote remove both
+git remote remove both > /dev/null 2>&1
 set -e
 REPO_ID=$(rad .)
 REPO_ID=${REPO_ID#"rad:"}
