@@ -5,7 +5,7 @@ resources:
   icon: git
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
-    tag_filter: v*
+    tag_regex: '^v\d+\.\d+\.\d+$'
     fetch_tags: true
     git_config:
     - name: safe.directory
@@ -27,6 +27,7 @@ jobs:
   plan:
   - get: github-actions-adapter
     trigger: true
+
 
   # test source
   - task: test
