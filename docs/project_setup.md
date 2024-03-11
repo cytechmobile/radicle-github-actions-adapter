@@ -22,7 +22,7 @@ The repository should be already initialised as a Radicle repository for this sc
 ### Radicle settings for GitHub Actions
 
 Repository should persist information in order to store the GitHub's username and repository that the actions will run.
-These information should be stored under the `.radicle/github-action.yaml` file within the repo's root directory.
+These information should be stored under the `.radicle/github_actions.yaml` file within the repo's root directory.
 The content of the file should be:
 
 ```yaml

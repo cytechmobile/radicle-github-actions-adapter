@@ -26,10 +26,10 @@ read workspace_name
 printf "\n${CYAN}    Please provide the GitHub's repo name: ${NC}"
 read repo_name
 
-printf "\n${GREEN}Populating .radicle/github-action.yaml sile.${NC}\n"
+printf "\n${GREEN}Populating .radicle/github_actions.yaml sile.${NC}\n"
 mkdir -p .radicle
 echo "github_username: $workspace_name
-github_repo: $repo_name" > .radicle/github-action.yaml
+github_repo: $repo_name" > .radicle/github_actions.yaml
 
 printf "\n${GREEN}Updating git remote both.${NC}\n"
 set +e
