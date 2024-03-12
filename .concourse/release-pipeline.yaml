@@ -1,5 +1,5 @@
 resources:
-# The repo with our Dockerfile
+# The repo resource
 - name: github-actions-adapter
   type: git
   icon: git
