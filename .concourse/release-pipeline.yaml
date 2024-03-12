@@ -6,6 +6,7 @@ resources:
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
     fetch_tags: true
+    tag_regex: '^v\d+\.\d+\.\d+$'
     git_config:
     - name: safe.directory
       value: /tmp/build/get
@@ -25,7 +26,6 @@ jobs:
   plan:
   - get: github-actions-adapter
     trigger: true
-    tags: [v.0]
 
   # test source
   - task: test
