@@ -49,7 +49,7 @@ func (gas *GitHubActionsServer) preparePatchCommentInfoMessage(resultResponse br
 	for _, result := range resultResponse.ResultDetails {
 		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo, result.WorkflowID)
 		commentMessage += "\n\n - "
-		commentMessage += fmt.Sprintf("[%s (%s)](%s) ⏳", result.WorkflowName, result.WorkflowID, url)
+		commentMessage += fmt.Sprintf(`[%s (%s) ⏳](%s "started")`, result.WorkflowName, result.WorkflowID, url)
 	}
 	return commentMessage
 }
@@ -69,14 +69,14 @@ func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse 
 	for _, result := range resultResponse.ResultDetails {
 		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo, result.WorkflowID)
 		commentMessage += "\n\n - "
-		commentMessage += fmt.Sprintf("[%s (%s)](%s):", result.WorkflowName, result.WorkflowID, url)
+		icon := "⚠️️"
 		if result.WorkflowResult == githubops.WorkflowResultSuccess {
-			commentMessage += " ✅"
+			icon = "✅"
 		} else if result.WorkflowResult == githubops.WorkflowResultFailure {
-			commentMessage += " ❌"
-		} else {
-			commentMessage += " ⌛️"
+			icon = "❌"
 		}
+		commentMessage += fmt.Sprintf(`[%s (%s) %s](%s "%s")`, result.WorkflowName, result.WorkflowID, icon, url,
+			result.WorkflowResult)
 	}
 	return commentMessage
 }

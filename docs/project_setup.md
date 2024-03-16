@@ -113,7 +113,7 @@ git push both new-feature-x
 git push rad -o patch.message="Implemented feature X" HEAD:refs/patches
 ```
 
-If everything is set up correctly, a comment will ba added to the patch indicating the results of the GitHub Actions 
-workflows.
+If everything is set up correctly, some comments will ba added to the patch indicating the progress and the results of 
+the GitHub Actions workflows.
 
 ![github-actions-patch-comment.png](github-actions-patch-comment.png)
