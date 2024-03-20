@@ -66,10 +66,10 @@ jobs:
         - |
           cd github-actions-adapter
           COMMIT_HASH=$(git rev-parse HEAD)
-          env GOOS=linux GOARCH=amd64 go build -o=../binaries/radicle-github-actions-adapter-linux-amd64-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=linux GOARCH=arm64 go build -o=../binaries/radicle-github-actions-adapter-linux-arm64-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=darwin GOARCH=amd64 go build -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=darwin GOARCH=arm64 go build -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$COMMIT_HASH ./cmd/github-actions-adapter
+          env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-concourse-adapter/pkg/version.Version=development' -X 'radicle-concourse-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-amd64-$COMMIT_HASH ./cmd/github-actions-adapter
+          env GOOS=linux GOARCH=arm64 go build -ldflags "-X 'radicle-concourse-adapter/pkg/version.Version=development' -X 'radicle-concourse-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-arm64-$COMMIT_HASH ./cmd/github-actions-adapter
+          env GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'radicle-concourse-adapter/pkg/version.Version=development' -X 'radicle-concourse-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$COMMIT_HASH ./cmd/github-actions-adapter
+          env GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'radicle-concourse-adapter/pkg/version.Version=development' -X 'radicle-concourse-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$COMMIT_HASH ./cmd/github-actions-adapter
 
   # push images
   - put: bucket
