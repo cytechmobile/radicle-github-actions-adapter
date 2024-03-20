@@ -106,6 +106,11 @@ type ResponseMessage struct {
 	ResultDetails []WorkflowDetails `json:"-"`
 }
 
+func (rm *ResponseMessage) String() string {
+	return fmt.Sprintf("ResponseMessage{Response:%+v, RunID:%+v, Result:%+v, ResultDetails:%+v}", rm.Response,
+		*rm.RunID, rm.Result, rm.ResultDetails)
+}
+
 type WorkflowDetails struct {
 	WorkflowID     string `json:"workflow_id"`
 	WorkflowName   string `json:"workflow_name"`

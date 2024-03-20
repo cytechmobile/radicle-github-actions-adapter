@@ -2,7 +2,6 @@ package serve
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"radicle-github-actions-adapter/app"
 	"radicle-github-actions-adapter/app/broker"
@@ -62,7 +61,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 			ID: eventUUID,
 		},
 	}
-	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", jobResponse))
+	gas.App.Logger.Debug("sending message", "message", jobResponse)
 	err = gas.Broker.ServeResponse(ctx, jobResponse)
 	if err != nil {
 		gas.App.Logger.Error("could not send response message to broker", "error", err.Error())
@@ -109,7 +108,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
 		}
 	}
-	gas.App.Logger.Debug("sending message", "message", fmt.Sprintf("%+v", resultResponse))
+	gas.App.Logger.Debug("sending message", "message", resultResponse)
 	err = gas.Broker.ServeResponse(ctx, resultResponse)
 	if err != nil {
 		gas.App.Logger.Error("could not send response message to broker", "error", err.Error())
