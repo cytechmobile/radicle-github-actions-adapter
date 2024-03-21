@@ -77,7 +77,7 @@ Application binary accepts specific arguments at init time. There are:
 
 Application uses SemVer version releases withVersion Control System's metadata. In order to specify a binary's version
 it is generated from the revision of the source code and optionally the dirty flag which indicates if the binary
-contains uncommitted changes. Here is an example version output: 
+contains uncommitted changes. Here is an example of the version output: 
 
 ```
 version: development, build_time: Fri Feb 16 16:53:24 EET 2024, revision: e63d3e19138f7165d11a5d046a1703ba06a69b23-dirty
