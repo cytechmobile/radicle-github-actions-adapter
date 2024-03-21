@@ -7,7 +7,7 @@ resources:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
     branch: main
     paths:
-    - README.md
+    - version
     git_config:
     - name: safe.directory
       value: /tmp/build/get
@@ -69,11 +69,12 @@ jobs:
         - |
           cd github-actions-adapter
           COMMIT_HASH=$(git rev-parse HEAD)
-          VERSION=$(head -n 1 CHANGELOG.md)
-          echo Building version: $VERSION
-          echo $(date)
-          echo now is $(date) - $COMMIT_HASH
-          echo radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH
+          VERSION=$(head -n 1 version)
+          echo Releasing version: $VERSION
+          env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(date)'" -o=../binaries/radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
+          env GOOS=linux GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(date)'" -o=../binaries/radicle-github-actions-adapter-linux-arm64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
+          env GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(date)'" -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
+          env GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(date)'" -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
 
   # push images
   - put: bucket
