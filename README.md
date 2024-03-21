@@ -47,7 +47,7 @@ value for each one of them:
  
 ### Running the application
 
-In order to build the **Radicle GitHub Actions Adapter** execute the provided makefile under project's root directory:
+In order to build the **Radicle GitHub Actions Adapter** use the provided makefile under project's root directory:
 
 ```bash
 make build

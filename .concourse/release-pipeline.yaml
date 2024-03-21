@@ -68,7 +68,7 @@ jobs:
         - -c
         - |
           cd github-actions-adapter
-          VERSION=$(head -n 1 version)
+          VERSION=v0.0.1
           echo Building version: $VERSION
           echo $(date)
           echo now is $(date) - $COMMIT_HASH
