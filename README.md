@@ -62,7 +62,7 @@ make run
 
 Standard I/O is used for communication with the broker. Logging is directed to stderr.
 
-> Radicle broker requires an executable of the adapter. Use `make build` to get only the binary
+> Radicle broker requires an executable of the adapter. Use `make build` to generate the binary.
 
 ### Application arguments
 
