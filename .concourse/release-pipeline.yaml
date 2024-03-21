@@ -16,7 +16,7 @@ resources:
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
     paths:
-      - version
+      - ./version
     git_config:
     - name: safe.directory
       value: /tmp/build/get
@@ -61,6 +61,7 @@ jobs:
 - name: release-pipeline
   plan:
   - get: github-actions-adapter-version
+    passed: [test-pipeline]
     trigger: true
 
   # build images
@@ -85,10 +86,13 @@ jobs:
           cd github-actions-adapter
           VERSION=$(head -n 1 version)
           echo Building version: $VERSION
-          env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=linux GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-arm64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
-          env GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
+          echo $(date)
+          echo nws is $(date)
+          echo radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH
+#          env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
+#          env GOOS=linux GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-linux-arm64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
+#          env GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
+#          env GOOS=darwin GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=../binaries/radicle-github-actions-adapter-darwin-arm64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
 
   # push images
   - put: bucket
