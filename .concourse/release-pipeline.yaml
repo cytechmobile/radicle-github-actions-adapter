@@ -5,6 +5,9 @@ resources:
   icon: git
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
+    branch: main
+    paths:
+    - README.md
     git_config:
     - name: safe.directory
       value: /tmp/build/get
@@ -66,8 +69,11 @@ jobs:
         - |
           cd github-actions-adapter
           COMMIT_HASH=$(git rev-parse HEAD)
-          echo $COMMIT_HASH
-          echo bye
+          VERSION=$(head -n 1 CHANGELOG.md)
+          echo Building version: $VERSION
+          echo $(date)
+          echo now is $(date) - $COMMIT_HASH
+          echo radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH
 
   # push images
   - put: bucket
