@@ -6,8 +6,8 @@ resources:
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
     git_config:
-      - name: safe.directory
-        value: /tmp/build/get
+    - name: safe.directory
+      value: /tmp/build/get
 
 # Where we will push the binaries
 - name: bucket
@@ -22,7 +22,7 @@ resources:
 jobs:
 - name: release-pipeline
   plan:
-  - check: github-actions-adapter
+  - get: github-actions-adapter
     trigger: true
 
   # test source
@@ -35,7 +35,7 @@ jobs:
           repository: golang
           tag: 1.21.0
       inputs:
-      - name: github-actions-adapter
+        - name: github-actions-adapter
       run:
         path: sh
         args:
@@ -66,11 +66,8 @@ jobs:
         - |
           cd github-actions-adapter
           COMMIT_HASH=$(git rev-parse HEAD)
-          VERSION=$(head -n 1 CHANGELOG.md)
-          echo Building version: $VERSION
-          echo $(date)
-          echo now is $(date) - $COMMIT_HASH
-          echo radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH
+          echo $COMMIT_HASH
+          echo bye
 
   # push images
   - put: bucket
