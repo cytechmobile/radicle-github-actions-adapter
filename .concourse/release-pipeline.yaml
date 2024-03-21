@@ -24,7 +24,7 @@ resources:
 jobs:
 - name: release-pipeline
   plan:
-  - get: github-actions-adapter-version
+  - get: github-actions-adapter
     trigger: true
 
   # test source
