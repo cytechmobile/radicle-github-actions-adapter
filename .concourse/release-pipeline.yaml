@@ -58,10 +58,10 @@ jobs:
             make test
             env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version .Version=development' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=/tmp/radicle-github-actions-adapter ./cmd/github-actions-adapter
 
-  - name: release-pipeline
-    plan:
-      - get: github-actions-adapter-version
-        trigger: true
+- name: release-pipeline
+  plan:
+  - get: github-actions-adapter-version
+    trigger: true
 
   # build images
   - task: build-binaries
