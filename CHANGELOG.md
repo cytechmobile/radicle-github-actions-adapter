@@ -9,7 +9,7 @@ Check [Changelog Format](#Changelog-Format) for more details about this changelo
 
 - Configure through env vars
 - Support multiple GitHub Action workflows monitoring
-- Support add comments on patch with information for the GitHub Actions and results in markdown format
+- Support add comments on patch with information for the GitHub Actions and results in Markdown format
 
 ## Changelog Format
 
