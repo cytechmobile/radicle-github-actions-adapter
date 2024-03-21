@@ -5,21 +5,11 @@ resources:
   icon: git
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
+#    paths:
+#      - ./version
     git_config:
       - name: safe.directory
         value: /tmp/build/get
-
-# The repo resource when version changes
-- name: github-actions-adapter-version
-  type: git
-  icon: git
-  source:
-    uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
-    paths:
-      - ./version
-    git_config:
-    - name: safe.directory
-      value: /tmp/build/get
 
 # Where we will push the binaries
 - name: bucket
@@ -32,9 +22,9 @@ resources:
     endpoint: minio-api.radicle.gr
 
 jobs:
-- name: test-pipeline
+- name: release-pipeline
   plan:
-  - get: github-actions-adapter
+  - get: github-actions-adapter-version
     trigger: true
 
   # test source
@@ -57,12 +47,6 @@ jobs:
             make tidy
             make test
             env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version .Version=development' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=/tmp/radicle-github-actions-adapter ./cmd/github-actions-adapter
-
-- name: release-pipeline
-  plan:
-  - get: github-actions-adapter-version
-    passed: [test-pipeline]
-    trigger: true
 
   # build images
   - task: build-binaries
