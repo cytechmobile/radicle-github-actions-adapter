@@ -25,7 +25,7 @@ resources:
 jobs:
 - name: release-pipeline
   plan:
-  - get: github-actions-adapter
+  - check: github-actions-adapter
     trigger: true
 
   # test source
@@ -47,7 +47,6 @@ jobs:
             cd github-actions-adapter
             make tidy
             make test
-            env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version .Version=development' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(shell date)'" -o=/tmp/radicle-github-actions-adapter ./cmd/github-actions-adapter
 
   # build images
   - task: build-binaries
@@ -72,8 +71,8 @@ jobs:
           VERSION=$(head -n 1 version)
           echo Building version: $VERSION
           echo $(date)
-          echo nws is $(date)
-          echo radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH
+          echo now is $(date) - $COMMIT_HASH
+          echo radicle-github-actions-adapter-linux-amd64-$(VERSION)-$(COMMIT_HASH)
 #          env GOOS=linux GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(date)'" -o=../binaries/radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
 #          env GOOS=linux GOARCH=arm64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(date)'" -o=../binaries/radicle-github-actions-adapter-linux-arm64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
 #          env GOOS=darwin GOARCH=amd64 go build -ldflags "-X 'radicle-github-actions-adapter/pkg/version.Version=$VERSION' -X 'radicle-github-actions-adapter/pkg/version.BuildTime=$(date)'" -o=../binaries/radicle-github-actions-adapter-darwin-amd64-$VERSION-$COMMIT_HASH ./cmd/github-actions-adapter
