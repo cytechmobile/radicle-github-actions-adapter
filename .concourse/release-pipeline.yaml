@@ -5,7 +5,6 @@ resources:
   icon: git
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
-    branch: main
     git_config:
       - name: safe.directory
         value: /tmp/build/get
@@ -36,7 +35,7 @@ jobs:
           repository: golang
           tag: 1.21.0
       inputs:
-        - name: github-actions-adapter
+      - name: github-actions-adapter
       run:
         path: sh
         args:
@@ -45,3 +44,48 @@ jobs:
             cd github-actions-adapter
             make tidy
             make test
+
+  # build images
+  - task: build-binaries
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: golang
+          tag: 1.21.0
+
+      inputs:
+      - name: github-actions-adapter
+      outputs:
+      - name: binaries
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          cd github-actions-adapter
+          COMMIT_HASH=$(git rev-parse HEAD)
+          VERSION=$(head -n 1 CHANGELOG.md)
+          echo Building version: $VERSION
+          echo $(date)
+          echo now is $(date) - $COMMIT_HASH
+          echo radicle-github-actions-adapter-linux-amd64-$VERSION-$COMMIT_HASH
+
+  # push images
+  - put: bucket
+    params:
+      file: binaries/radicle-github-actions-adapter-linux-amd64*
+      acl: public-read
+  - put: bucket
+    params:
+      file: binaries/radicle-github-actions-adapter-linux-arm64*
+      acl: public-read
+  - put: bucket
+    params:
+      file: binaries/radicle-github-actions-adapter-darwin-amd64*
+      acl: public-read
+  - put: bucket
+    params:
+      file: binaries/radicle-github-actions-adapter-darwin-arm64*
+      acl: public-read
