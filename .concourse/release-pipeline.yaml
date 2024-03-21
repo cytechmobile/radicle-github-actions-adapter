@@ -5,8 +5,9 @@ resources:
   icon: git
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
+    branch: main
     paths:
-      - ./version
+      - README.md
     git_config:
       - name: safe.directory
         value: /tmp/build/get
