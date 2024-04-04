@@ -20,8 +20,7 @@ The minimum requirement for compiling and running this application are:
 
 Alongside the Radicle CI Broker, a Radicle node must be running on the same host.
 `radicle-httpd` is also required alongside the `RAD_SESSION_TOKEN` in order to add patch comments when a 
-workflow completes. It is also required that the specific Radicle node is added as a delegate to the repositories in 
-order to have appropriate permissions to add comments into patches.
+workflow completes.
 
 ### Configuration
 
@@ -38,13 +37,18 @@ value for each one of them:
 | `WORKFLOWS_START_LAG_SECS`    | Lag time before giving up checking for GitHub's commit and workflows.        | 60                      |
 | `WORKFLOWS_POLL_TIMEOUT_SECS` | Polling timeout for workflows completion.                                    | 1800                    |
 
-> `GITHUB_PAT` should have at least read access at the repo and the actions/workflows. Please check GitHub's [rate 
-> limiting policy](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api). For public 
-> repositories there is no requirement for any specific access.
- 
-> `WORKFLOWS_START_LAG_SECS` is a necessary lag time as it is possible to push first to the radicle forge and then to 
-> GitHub. This would generate an error as the adapter won't be able to find the commit at GitHub or the workflows 
-> might have not been spawned.  
+`GITHUB_PAT` is not strictly required for public GitHub Repos.
+For accessing **private repos** it should have at least read access for the
+repo (`repo` access) and the actions/workflows (`workflow` access).
+For accessing **public repos** it is highly advised to provide a GitHub Personal
+Access Token (even without any permission) as GitHub has a
+[rate limiting policy](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)
+for accessing its API without any token.
+
+`WORKFLOWS_START_LAG_SECS` is a necessary lag time as it is possible to push first to the radicle forge and then to
+GitHub. This would generate an error as the adapter won't be able to find the commit at GitHub or the workflows
+might have not been spawned at that time. So, the adapter will wait up to that time before checking at GitHub for 
+the repo, the commit and the workflows.
  
 ### Running the application
 
