@@ -6,8 +6,8 @@ resources:
   source:
     uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
 #    branch: main
-    paths:
-    - version
+#    paths:
+#    - version
     git_config:
     - name: safe.directory
       value: /tmp/build/get
