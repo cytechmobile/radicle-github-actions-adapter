@@ -63,7 +63,8 @@ func TestRadicle_Comment(t *testing.T) {
 						t.Errorf("Add patch comment  could not read request body %v", err)
 					}
 					if !strings.Contains(string(body), "some very important message") {
-						t.Errorf("Add patch comment request payload got = %v, want %v", string(body), "some very important message")
+						t.Errorf("Add patch comment request payload got = %v, want %v", string(body),
+							"some very important message")
 					}
 					if req.Header.Get("content-type") != "application/json" {
 						t.Errorf("Add patch comment request header content-type got = %v, want %v",
@@ -76,7 +77,8 @@ func TestRadicle_Comment(t *testing.T) {
 					}
 					resp := http.Response{
 						StatusCode: http.StatusOK,
-						Body:       http.NoBody,
+						Body: io.NopCloser(strings.NewReader(`{"success":true,
+						"id":"fae95962fb381853127c43689e7c0801e93bf2b0"}`)),
 					}
 					return &resp, nil
 				},
@@ -109,7 +111,8 @@ func TestRadicle_Comment(t *testing.T) {
 						t.Errorf("Add patch comment  could not read request body %v", err)
 					}
 					if !strings.Contains(string(body), "some very important message") {
-						t.Errorf("Add patch comment request payload got = %v, want %v", string(body), "some very important message")
+						t.Errorf("Add patch comment request payload got = %v, want %v", string(body),
+							"some very important message")
 					}
 					if req.Header.Get("content-type") != "application/json" {
 						t.Errorf("Add patch comment request header content-type got = %v, want %v",
@@ -148,7 +151,8 @@ func TestRadicle_Comment(t *testing.T) {
 				client:  &mockClient,
 				logger:  tt.fields.logger,
 			}
-			if err := r.Comment(tt.args.ctx, tt.args.repoID, tt.args.patchID, tt.args.revisionID, tt.args.message); (err != nil) != tt.wantErr {
+			if err := r.Comment(tt.args.ctx, tt.args.repoID, tt.args.patchID, tt.args.revisionID,
+				tt.args.message); (err != nil) != tt.wantErr {
 				t.Errorf("Comment() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

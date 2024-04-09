@@ -166,7 +166,7 @@ func (g *MockGitHubActions) GetRepoCommitWorkflowsResults(ctx context.Context, g
 		return nil, errors.New("invalid repos")
 	}
 
-	workflowResults := []app.WorkflowResult{}
+	var workflowResults []app.WorkflowResult
 	for i := 0; i < totalWorkflows; i++ {
 		workId := i
 		result := githubops.WorkflowResultSuccess

@@ -80,24 +80,13 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	if repoCommitWorkflowSetup != nil {
 		// Write 1st comment that we check GitHub for workflows
 		if brokerRequestMessage.PatchEvent != nil {
-			commentMessage := gas.preparePatchCommentStartMessage(resultResponse, *repoCommitWorkflowSetup)
+			commentMessage := "Checking for GitHub Actions Workflows..."
 			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
 		}
-		// Find GitHub Workflows
-		workflowsResult, err := gas.checkRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
-		if err != nil {
-			gas.App.Logger.Error("could not check for github workflows")
-			return err
-		}
-		if brokerRequestMessage.PatchEvent != nil {
-			detailsResponse := resultResponse
-			gas.updateResponseResults(&detailsResponse, workflowsResult)
-			commentMessage := gas.preparePatchCommentInfoMessage(detailsResponse, *repoCommitWorkflowSetup)
-			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
-		}
+		time.Sleep(time.Second * time.Duration(gas.App.Config.WorkflowsStartLagSecs))
 
 		//Wait for GitHub Workflows results and write comment
-		workflowsResult, err = gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
+		workflowsResult, err := gas.waitRepoCommitWorkflows(ctx, repoCommitWorkflowSetup, brokerRequestMessage)
 		if err != nil {
 			gas.App.Logger.Error("failed waiting for github workflows")
 			return err
@@ -121,26 +110,20 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 func (gas *GitHubActionsServer) updateResponseResults(resultResponse *broker.ResponseMessage, workflowsResult []app.
 	WorkflowResult) {
 	for _, workflowResult := range workflowsResult {
-		resultResponse.ResultDetails = append(resultResponse.ResultDetails, broker.WorkflowDetails{
+		workflowDetails := broker.WorkflowDetails{
 			WorkflowID:     workflowResult.WorkflowID,
 			WorkflowName:   workflowResult.WorkflowName,
 			WorkflowResult: workflowResult.Result,
-		})
-		if workflowResult.Result != githubops.WorkflowResultSuccess {
+		}
+		if len(workflowDetails.WorkflowResult) == 0 {
+			workflowDetails.WorkflowResult = workflowResult.Status
+		}
+		resultResponse.ResultDetails = append(resultResponse.ResultDetails, workflowDetails)
+		if resultResponse.Response == app.BrokerResponseFinished &&
+			workflowResult.Result != githubops.WorkflowResultSuccess {
 			resultResponse.Result = app.BrokerResultFailure
 		}
 	}
-}
-
-// checkRepoCommitWorkflows waits for all workflows to start execution and returns their details.
-// A lag time WorkflowsStartLagSecs is used in order to reassure that commit has pushed to github and all workflows
-// has spawned.
-func (gas *GitHubActionsServer) checkRepoCommitWorkflows(ctx context.Context,
-	repoCommitWorkflowSetup *app.GitHubActionsSettings, brokerRequestMessage *broker.RequestMessage) ([]app.
-	WorkflowResult, error) {
-	time.Sleep(time.Second * time.Duration(gas.App.Config.WorkflowsStartLagSecs))
-	return gas.GitHubActions.GetRepoCommitWorkflowsResults(ctx, repoCommitWorkflowSetup.GitHubUsername,
-		repoCommitWorkflowSetup.GitHubRepo, brokerRequestMessage.Commit)
 }
 
 // waitRepoCommitWorkflows waits for all workflows to complete execution and returns their results.
@@ -168,6 +151,15 @@ func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 		if workflowsCompleted {
 			gas.App.Logger.Info("all workflows execution complete")
 			break
+		}
+		if brokerRequestMessage.PatchEvent != nil {
+			resultResponse := broker.ResponseMessage{
+				Response: app.BrokerResponseInProgress,
+				Result:   app.BrokerResultSuccess,
+			}
+			gas.updateResponseResults(&resultResponse, workflowsResult)
+			commentMessage := gas.preparePatchCommentResultMessage(resultResponse, *repoCommitWorkflowSetup)
+			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
 		}
 		time.Sleep(app.WorkflowCheckInterval)
 	}

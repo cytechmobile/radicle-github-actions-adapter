@@ -30,47 +30,36 @@ func (gas *GitHubActionsServer) commentOnPatch(ctx context.Context,
 
 }
 
-// preparePatchCommentStartMessage prepares a message for adding as patch comment with information about starting to
-// check for GitHub workflows.
-func (gas *GitHubActionsServer) preparePatchCommentStartMessage(resultResponse broker.ResponseMessage,
-	gitHubActionsSettings app.GitHubActionsSettings) string {
-	commentMessage := "Checking for GitHub Actions Workflows."
-	return commentMessage
-}
-
-// preparePatchCommentInfoMessage prepares a message for adding as patch comment with information about the GitHub
-// workflows.
-func (gas *GitHubActionsServer) preparePatchCommentInfoMessage(resultResponse broker.ResponseMessage,
-	gitHubActionsSettings app.GitHubActionsSettings) string {
-	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
-	commentMessage := "GitHub Actions Workflows ⏳"
-
-	commentMessage += "\n\nWorkflows:"
-	for _, result := range resultResponse.ResultDetails {
-		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo, result.WorkflowID)
-		commentMessage += "\n\n - "
-		commentMessage += fmt.Sprintf(`[%s (%s) ⏳](%s "started")`, result.WorkflowName, result.WorkflowID, url)
-	}
-	return commentMessage
-}
-
 // preparePatchCommentResultMessage prepares a message for adding as patch comment with the workflow results.
 func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse broker.ResponseMessage,
 	gitHubActionsSettings app.GitHubActionsSettings) string {
 	githubWorkflowURL := "https://github.com/%s/%s/actions/runs/%s"
-	commentMessage := "GitHub Actions Result: " + resultResponse.Result
-	if resultResponse.Result == app.BrokerResultSuccess {
-		commentMessage += " ✅"
+	actionsStatus := "Result"
+	if resultResponse.Response == app.BrokerResponseInProgress {
+		actionsStatus = "Status"
+	}
+	commentMessage := "GitHub Actions " + actionsStatus + ": "
+	if resultResponse.Response == app.BrokerResponseInProgress {
+		commentMessage += app.BrokerResponseInProgress
+		commentMessage += " ⏳"
 	} else {
-		commentMessage += " ❌"
+		commentMessage += resultResponse.Result
+		if resultResponse.Result == app.BrokerResultSuccess {
+			commentMessage += " ✅"
+		} else {
+			commentMessage += " ❌"
+		}
 	}
 
 	commentMessage += "\n\nDetails:"
 	for _, result := range resultResponse.ResultDetails {
-		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo, result.WorkflowID)
+		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo,
+			result.WorkflowID)
 		commentMessage += "\n\n - "
 		icon := "⚠️️"
-		if result.WorkflowResult == githubops.WorkflowResultSuccess {
+		if result.WorkflowResult == githubops.WorkflowStatusInProgress {
+			icon = "⏳"
+		} else if result.WorkflowResult == githubops.WorkflowResultSuccess {
 			icon = "✅"
 		} else if result.WorkflowResult == githubops.WorkflowResultFailure {
 			icon = "❌"

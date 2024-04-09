@@ -8,13 +8,14 @@ import (
 type ContextKey string
 
 const (
-	EventUUIDKey            ContextKey    = "event-uuid"
-	RepoClonePathKey        ContextKey    = "repo-path"
-	BrokerResponseFinished  string        = "finished"
-	BrokerResponseTriggered string        = "triggered"
-	BrokerResultSuccess     string        = "success"
-	BrokerResultFailure     string        = "failure"
-	WorkflowCheckInterval   time.Duration = 10 * time.Second
+	EventUUIDKey             ContextKey    = "event-uuid"
+	RepoClonePathKey         ContextKey    = "repo-path"
+	BrokerResponseFinished   string        = "finished"
+	BrokerResponseTriggered  string        = "triggered"
+	BrokerResponseInProgress string        = "in progress"
+	BrokerResultSuccess      string        = "success"
+	BrokerResultFailure      string        = "failure"
+	WorkflowCheckInterval    time.Duration = 10 * time.Second
 )
 
 func (ck ContextKey) String() string {

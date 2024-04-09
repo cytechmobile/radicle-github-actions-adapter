@@ -16,10 +16,11 @@ import (
 const patchURL string = "%s/api/v1/projects/%s/patches/%s"
 
 type Radicle struct {
-	nodeURL string
-	token   string
-	client  httpClient
-	logger  *slog.Logger
+	nodeURL   string
+	token     string
+	client    httpClient
+	logger    *slog.Logger
+	commentID *string
 }
 
 func NewRadicle(nodeURL, token string, logger *slog.Logger) *Radicle {
@@ -40,12 +41,26 @@ func (r *Radicle) Comment(ctx context.Context, repoID, patchID, revisionID strin
 		Type:     radicle.CreatePatchCommentType,
 		Body:     message,
 		Revision: revisionID,
+		Embeds:   []string{},
+	}
+	if r.commentID != nil {
+		payload.Type = radicle.EditPatchCommentType
+		payload.Comment = r.commentID
 	}
 	createRadiclePatchComment := fmt.Sprintf(patchURL, r.nodeURL, repoID, patchID)
 	headers := map[string]string{}
 	headers["content-type"] = "application/json"
 	headers["Authorization"] = "Bearer " + r.token
-	return r.request(ctx, createRadiclePatchComment, http.MethodPatch, headers, payload)
+	type commentAddResp struct {
+		Success bool   `json:"success"`
+		Id      string `json:"id"`
+	}
+	resp := &commentAddResp{}
+	err := r.request(ctx, createRadiclePatchComment, http.MethodPatch, headers, payload, resp)
+	if nil == err && len(resp.Id) > 0 && r.commentID == nil {
+		r.commentID = &resp.Id
+	}
+	return err
 }
 
 type HttpError struct {
@@ -64,7 +79,7 @@ func (e HttpError) Error() string {
 }
 
 func (r *Radicle) request(ctx context.Context, rawurl, method string, headers map[string]string,
-	in interface{}) error {
+	in, out interface{}) error {
 	uri, err := url.Parse(rawurl)
 	if err != nil {
 		r.logger.Error("could not parse URL", "error", err.Error())
@@ -108,6 +123,8 @@ func (r *Radicle) request(ctx context.Context, rawurl, method string, headers ma
 		r.logger.Error("request responded with error message", "message", err.Body.Message)
 		return err
 	}
-
+	if out != nil {
+		return json.NewDecoder(resp.Body).Decode(out)
+	}
 	return nil
 }
