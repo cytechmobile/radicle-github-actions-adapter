@@ -3,6 +3,17 @@
 All notable changes for every released version of this project will be documented in this file.  
 Check [Changelog Format](#Changelog-Format) for more details about this changelog's format.
 
+## Unreleased
+
+### Changed
+
+- Support single comment in a patch (instead of multiple) which is updated periodically with workflows' progress and 
+  results
+
+### Fixed
+
+- Documentation issues and updates
+
 ## [0.5.0] - 2024-03-21
 
 ### Added
