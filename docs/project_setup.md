@@ -6,7 +6,7 @@ will inform back the broker with any results and also update any patch using com
 
 ## Project Setup
 
-In order to setup a project/repository to work with the Radicle GitHub Adapter we must add some metadata within the 
+In order to set up a project/repository to work with the Radicle GitHub Adapter we must add some metadata within the 
 repo about the GitHub Repository (workspace & repo name). We must also be able to push any change to both the 
 Radicle forge and the GitHub forge at the same time.
 
@@ -113,7 +113,9 @@ git push both new-feature-x
 git push rad -o patch.message="Implemented feature X" HEAD:refs/patches
 ```
 
-If everything is set up correctly, some comments will ba added to the patch indicating the progress and the results of 
-the GitHub Actions workflows.
+If everything is set up correctly, a comment will ba added to the patch providing information for the progress and the 
+results of the GitHub Actions workflows. The comment will be updated periodically with update information.
 
-![github-actions-patch-comment.png](github-actions-patch-comment.png)
+![Checking workflows comment](img/github-actions-patch-comment-1.png)  
+![Workflows status comment](img/github-actions-patch-comment-2.png)  
+![Workflows results comment](img/github-actions-patch-comment-3.png)  

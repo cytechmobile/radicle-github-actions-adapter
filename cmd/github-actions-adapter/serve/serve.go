@@ -80,7 +80,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	if repoCommitWorkflowSetup != nil {
 		// Write 1st comment that we check GitHub for workflows
 		if brokerRequestMessage.PatchEvent != nil {
-			commentMessage := "Checking for GitHub Actions Workflows..."
+			commentMessage := "### Checking for GitHub Actions Workflows..."
 			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage)
 		}
 		time.Sleep(time.Second * time.Duration(gas.App.Config.WorkflowsStartLagSecs))

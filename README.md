@@ -18,9 +18,8 @@ The minimum requirement for compiling and running this application are:
 - Go v1.21
 - make
 
-Alongside the Radicle CI Broker, a Radicle node must be running on the same host.
-`radicle-httpd` is also required alongside the `RAD_SESSION_TOKEN` in order to add patch comments when a 
-workflow completes.
+Alongside the Radicle CI Broker, a Radicle node must be running on the same host. `radicle-httpd` is also required 
+alongside the `RAD_SESSION_TOKEN` in order to add patch comments when a workflow completes.
 
 ### Configuration
 
