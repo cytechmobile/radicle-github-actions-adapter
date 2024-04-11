@@ -6,7 +6,6 @@ resources:
     icon: git
     source:
       uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
-      branch: "*"
       paths:
         - version
       git_config:
