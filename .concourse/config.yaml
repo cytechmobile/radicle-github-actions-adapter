@@ -6,13 +6,14 @@ resources:
     icon: git
     source:
       uri: https://seed.radicle.gr/zyMFFgrGTswVFj1X9uJrVwEV8EWu.git
+      branch: main
       paths:
         - version
       git_config:
         - name: safe.directory
           value: /tmp/build/get
     version:
-      ref:  ((commit_hash))
+      ref: ((commit_hash))
 
   # Where we will push the binaries
   - name: bucket
