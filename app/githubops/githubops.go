@@ -1,6 +1,8 @@
 package githubops
 
-import "context"
+import (
+	"context"
+)
 
 const (
 	WorkflowResultSuccess string = "success"
@@ -15,6 +17,14 @@ type WorkflowResult struct {
 	WorkflowName string
 	Status       string
 	Result       string
+	Artifacts    []WorkflowArtifact
+}
+
+type WorkflowArtifact struct {
+	Id     string
+	Name   string
+	Url    string
+	ApiUrl string
 }
 
 type GitHubOps interface {

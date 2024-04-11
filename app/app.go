@@ -32,6 +32,14 @@ type WorkflowResult struct {
 	WorkflowName string
 	Status       string
 	Result       string
+	Artifacts    []WorkflowArtifact
+}
+
+type WorkflowArtifact struct {
+	Id     string
+	Name   string
+	Url    string
+	ApiUrl string
 }
 
 // GitHubActions should be implemented to retrieve the GitHub Actions' outcome

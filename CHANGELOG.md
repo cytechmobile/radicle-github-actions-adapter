@@ -5,6 +5,10 @@ Check [Changelog Format](#Changelog-Format) for more details about this changelo
 
 ## Unreleased
 
+### Added
+
+- Add details and URLs of the generated artifacts by the GitHub Actions
+
 ### Changed
 
 - Support single comment in a patch (instead of multiple) which is updated periodically with workflows' progress and 

@@ -112,9 +112,17 @@ func (rm *ResponseMessage) String() string {
 }
 
 type WorkflowDetails struct {
-	WorkflowID     string `json:"workflow_id"`
-	WorkflowName   string `json:"workflow_name"`
-	WorkflowResult string `json:"workflow_result"`
+	WorkflowID        string             `json:"workflow_id"`
+	WorkflowName      string             `json:"workflow_name"`
+	WorkflowResult    string             `json:"workflow_result"`
+	WorkflowArtifacts []WorkflowArtifact `json:"workflow_artifacts"`
+}
+
+type WorkflowArtifact struct {
+	Id     string
+	Name   string
+	Url    string
+	ApiUrl string
 }
 
 type ResponseErrorMessage struct {

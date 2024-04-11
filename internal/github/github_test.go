@@ -67,6 +67,38 @@ func (a *Actions) ListRepositoryWorkflowRuns(ctx context.Context, owner, repo st
 	return nil, nil, errors.New("an error occurred")
 }
 
+func (a *Actions) ListWorkflowRunArtifacts(ctx context.Context, owner, repo string, runID int64,
+	opts *github.ListOptions) (*github.ArtifactList, *github.Response, error) {
+	// in order to mock this function we will use the repo to return the appropriate amount of workflows
+	if owner == "repo_owner" {
+		totalArtifacts, err := strconv.Atoi(repo)
+		if err != nil {
+			return nil, nil, errors.New("invalid repos")
+		}
+		if totalArtifacts < (opts.Page)*opts.PerPage {
+			return nil, nil, fmt.Errorf("request exceeds total artifacts %v, %v, %v", totalArtifacts,
+				opts.Page, opts.PerPage)
+		}
+		totlalArtifactsInt64 := int64(totalArtifacts)
+		artifacts := github.ArtifactList{
+			TotalCount: &totlalArtifactsInt64,
+			Artifacts:  []*github.Artifact{},
+		}
+		artifactUrl := "artifact-api-url"
+		for i := 0; i < totalArtifacts; i++ {
+			workId := int64(i)
+			workName := "artifact " + strconv.Itoa(i)
+			artifacts.Artifacts = append(artifacts.Artifacts, &github.Artifact{
+				ID:   &workId,
+				Name: &workName,
+				URL:  &artifactUrl,
+			})
+		}
+		return &artifacts, &github.Response{}, nil
+	}
+	return nil, nil, errors.New("an error occurred")
+}
+
 func TestGitHub_CheckRepoCommit(t *testing.T) {
 	mGH := MockGitHub{}
 	type fields struct {
@@ -176,6 +208,14 @@ func TestGitHub_GetRepoCommitWorkflows(t *testing.T) {
 					WorkflowName: "work 0",
 					Status:       githubops.WorkflowStatusCompleted,
 					Result:       githubops.WorkflowResultFailure,
+					Artifacts: []githubops.WorkflowArtifact{
+						{
+							Id:     "0",
+							Name:   "artifact 0",
+							Url:    "https://github.com/repo_owner/1/actions/runs/0/artifacts/0",
+							ApiUrl: "artifact-api-url",
+						},
+					},
 				},
 			},
 			wantErr: false,
@@ -252,27 +292,6 @@ func TestGitHub_GetRepoCommitWorkflows(t *testing.T) {
 				if !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("GetRepoCommitWorkflows() got = %v, want %v", got, tt.want)
 				}
-			}
-		})
-	}
-}
-
-func TestNewGitHub(t *testing.T) {
-	type args struct {
-		pat    string
-		logger *slog.Logger
-	}
-	tests := []struct {
-		name string
-		args args
-		want *GitHub
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewGitHub(tt.args.pat, tt.args.logger); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewGitHub() = %v, want %v", got, tt.want)
 			}
 		})
 	}

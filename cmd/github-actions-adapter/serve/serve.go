@@ -118,6 +118,14 @@ func (gas *GitHubActionsServer) updateResponseResults(resultResponse *broker.Res
 		if len(workflowDetails.WorkflowResult) == 0 {
 			workflowDetails.WorkflowResult = workflowResult.Status
 		}
+		for _, artifact := range workflowResult.Artifacts {
+			workflowDetails.WorkflowArtifacts = append(workflowDetails.WorkflowArtifacts, broker.WorkflowArtifact{
+				Id:     artifact.Id,
+				Name:   artifact.Name,
+				Url:    artifact.Url,
+				ApiUrl: artifact.ApiUrl,
+			})
+		}
 		resultResponse.ResultDetails = append(resultResponse.ResultDetails, workflowDetails)
 		if resultResponse.Response == app.BrokerResponseFinished &&
 			workflowResult.Result != githubops.WorkflowResultSuccess {

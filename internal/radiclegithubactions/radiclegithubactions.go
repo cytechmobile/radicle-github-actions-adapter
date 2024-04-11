@@ -84,11 +84,21 @@ func (rga *RadicleGitHubActions) GetRepoCommitWorkflowsResults(ctx context.Conte
 	}
 	var workflows []app.WorkflowResult
 	for _, githubWorkflow := range githubWorkflows {
+		var workflowArtifacts []app.WorkflowArtifact
+		for _, artifact := range githubWorkflow.Artifacts {
+			workflowArtifacts = append(workflowArtifacts, app.WorkflowArtifact{
+				Id:     artifact.Id,
+				Name:   artifact.Name,
+				Url:    artifact.Url,
+				ApiUrl: artifact.ApiUrl,
+			})
+		}
 		workflows = append(workflows, app.WorkflowResult{
 			WorkflowID:   githubWorkflow.WorkflowID,
 			WorkflowName: githubWorkflow.WorkflowName,
 			Status:       githubWorkflow.Status,
 			Result:       githubWorkflow.Result,
+			Artifacts:    workflowArtifacts,
 		})
 	}
 	rga.logger.Debug(fmt.Sprintf("found GitHub actions workflows: %+v", workflows))

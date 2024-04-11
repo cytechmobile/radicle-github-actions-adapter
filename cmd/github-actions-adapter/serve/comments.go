@@ -38,7 +38,7 @@ func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse 
 	if resultResponse.Response == app.BrokerResponseInProgress {
 		actionsStatus = "Status"
 	}
-	commentMessage := "GitHub Actions " + actionsStatus + ": "
+	commentMessage := "### GitHub Actions " + actionsStatus + ": "
 	if resultResponse.Response == app.BrokerResponseInProgress {
 		commentMessage += app.BrokerResponseInProgress
 		commentMessage += " ⏳"
@@ -50,12 +50,11 @@ func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse 
 			commentMessage += " ❌"
 		}
 	}
-
-	commentMessage += "\n\nDetails:"
+	commentMessage += "\n Workflows:"
 	for _, result := range resultResponse.ResultDetails {
 		url := fmt.Sprintf(githubWorkflowURL, gitHubActionsSettings.GitHubUsername, gitHubActionsSettings.GitHubRepo,
 			result.WorkflowID)
-		commentMessage += "\n\n - "
+		commentMessage += "\n - "
 		icon := "⚠️️"
 		if result.WorkflowResult == githubops.WorkflowStatusInProgress {
 			icon = "⏳"
@@ -66,6 +65,12 @@ func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse 
 		}
 		commentMessage += fmt.Sprintf(`[%s (%s) %s](%s "%s")`, result.WorkflowName, result.WorkflowID, icon, url,
 			result.WorkflowResult)
+		if len(result.WorkflowArtifacts) > 0 {
+			commentMessage += "\n\t Artifacts:"
+			for _, artifact := range result.WorkflowArtifacts {
+				commentMessage += fmt.Sprintf("\n\t\t - [%s (%s)](%s)", artifact.Name, artifact.Id, artifact.Url)
+			}
+		}
 	}
 	return commentMessage
 }
