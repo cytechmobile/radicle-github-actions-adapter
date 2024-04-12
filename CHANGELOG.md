@@ -8,6 +8,7 @@ Check [Changelog Format](#Changelog-Format) for more details about this changelo
 ### Added
 
 - Add details and URLs of the generated artifacts by the GitHub Actions
+- Append error details in the patch's comment in case of an error occurs
 
 ### Changed
 

@@ -152,7 +152,7 @@ func TestRadicle_Comment(t *testing.T) {
 				logger:  tt.fields.logger,
 			}
 			if err := r.Comment(tt.args.ctx, tt.args.repoID, tt.args.patchID, tt.args.revisionID,
-				tt.args.message); (err != nil) != tt.wantErr {
+				tt.args.message, false); (err != nil) != tt.wantErr {
 				t.Errorf("Comment() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

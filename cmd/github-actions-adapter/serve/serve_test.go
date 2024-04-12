@@ -188,7 +188,8 @@ type MockRadiclePatch struct {
 	t             *testing.T
 }
 
-func (p *MockRadiclePatch) Comment(ctx context.Context, repoID, patchID, revisionID string, message string) error {
+func (p *MockRadiclePatch) Comment(ctx context.Context, repoID, patchID, revisionID, message string,
+	append bool) error {
 	eventUUID := ctx.Value(app.EventUUIDKey).(string)
 	if strings.Contains(eventUUID, "invalid") {
 		p.t.Error("unknown error")
@@ -464,7 +465,7 @@ func TestGitHubActions_PreparePatchCommentMessage(t *testing.T) {
 					{WorkflowID: "2", WorkflowName: "UnitTests", WorkflowResult: githubops.WorkflowResultFailure},
 				},
 			},
-			expected: "GitHub Actions Result: success ✅\n\nDetails:\n\n - [BuildTest (1) ✅](https://github.com/testUser/testRepo/actions/runs/1 \"success\")\n\n - [UnitTests (2) ❌](https://github.com/testUser/testRepo/actions/runs/2 \"failure\")",
+			expected: "### GitHub Actions Result: success ✅\n Workflows:\n - [BuildTest (1) ✅](https://github.com/testUser/testRepo/actions/runs/1 \"success\")\n - [UnitTests (2) ❌](https://github.com/testUser/testRepo/actions/runs/2 \"failure\")",
 		},
 		{
 			name: "PreparePatchCommentMessage is successful using only failed results",
@@ -475,7 +476,7 @@ func TestGitHubActions_PreparePatchCommentMessage(t *testing.T) {
 					{WorkflowID: "2", WorkflowName: "UnitTests", WorkflowResult: githubops.WorkflowResultFailure},
 				},
 			},
-			expected: "GitHub Actions Result: failure ❌\n\nDetails:\n\n - [BuildTest (1) ✅](https://github.com/testUser/testRepo/actions/runs/1 \"success\")\n\n - [UnitTests (2) ❌](https://github.com/testUser/testRepo/actions/runs/2 \"failure\")",
+			expected: "### GitHub Actions Result: failure ❌\n Workflows:\n - [BuildTest (1) ✅](https://github.com/testUser/testRepo/actions/runs/1 \"success\")\n - [UnitTests (2) ❌](https://github.com/testUser/testRepo/actions/runs/2 \"failure\")",
 		},
 		{
 			name: "PreparePatchCommentMessage is successful using mixed results",
@@ -487,7 +488,7 @@ func TestGitHubActions_PreparePatchCommentMessage(t *testing.T) {
 					{WorkflowID: "3", WorkflowName: "IntegrationTests", WorkflowResult: "otherResult"},
 				},
 			},
-			expected: "GitHub Actions Result: failure ❌\n\nDetails:\n\n - [BuildTest (1) ✅](https://github.com/testUser/testRepo/actions/runs/1 \"success\")\n\n - [UnitTests (2) ❌](https://github.com/testUser/testRepo/actions/runs/2 \"failure\")\n\n - [IntegrationTests (3) ⚠️️](https://github.com/testUser/testRepo/actions/runs/3 \"otherResult\")",
+			expected: "### GitHub Actions Result: failure ❌\n Workflows:\n - [BuildTest (1) ✅](https://github.com/testUser/testRepo/actions/runs/1 \"success\")\n - [UnitTests (2) ❌](https://github.com/testUser/testRepo/actions/runs/2 \"failure\")\n - [IntegrationTests (3) ⚠️️](https://github.com/testUser/testRepo/actions/runs/3 \"otherResult\")",
 		},
 	}
 

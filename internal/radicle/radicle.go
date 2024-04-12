@@ -21,6 +21,7 @@ type Radicle struct {
 	client    httpClient
 	logger    *slog.Logger
 	commentID *string
+	message   *string
 }
 
 func NewRadicle(nodeURL, token string, logger *slog.Logger) *Radicle {
@@ -36,7 +37,10 @@ type httpClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func (r *Radicle) Comment(ctx context.Context, repoID, patchID, revisionID string, message string) error {
+func (r *Radicle) Comment(ctx context.Context, repoID, patchID, revisionID, message string, append bool) error {
+	if append && r.message != nil {
+		message = *r.message + "\n  \n  " + message
+	}
 	payload := radicle.CreatePatchComment{
 		Type:     radicle.CreatePatchCommentType,
 		Body:     message,
@@ -60,6 +64,7 @@ func (r *Radicle) Comment(ctx context.Context, repoID, patchID, revisionID strin
 	if nil == err && len(resp.Id) > 0 && r.commentID == nil {
 		r.commentID = &resp.Id
 	}
+	r.message = &message
 	return err
 }
 

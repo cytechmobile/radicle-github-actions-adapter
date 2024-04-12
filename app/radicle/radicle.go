@@ -15,5 +15,5 @@ type CreatePatchComment struct {
 
 // Patch should be implemented to support actions on Redicle patch
 type Patch interface {
-	Comment(ctx context.Context, repoID, patchID, revisionID string, message string) error
+	Comment(ctx context.Context, repoID, patchID, revisionID, message string, append bool) error
 }
