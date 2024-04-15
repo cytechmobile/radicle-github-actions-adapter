@@ -179,7 +179,7 @@ func (gas *GitHubActionsServer) waitRepoCommitWorkflows(ctx context.Context,
 			}
 		}
 		if workflowsCompleted {
-			gas.App.Logger.Info("all workflows execution complete")
+			gas.App.Logger.Info("all workflows execution completed")
 			break
 		}
 		if brokerRequestMessage.PatchEvent != nil {

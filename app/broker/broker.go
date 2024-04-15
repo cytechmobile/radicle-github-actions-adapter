@@ -38,6 +38,7 @@ type RequestPushEventMessage struct {
 	Pusher     Pusher     `json:"pusher"`
 	Before     string     `json:"before"`
 	After      string     `json:"after"`
+	Branch     string     `json:"branch"`
 	Commits    []string   `json:"commits"`
 	Repository Repository `json:"repository"`
 }

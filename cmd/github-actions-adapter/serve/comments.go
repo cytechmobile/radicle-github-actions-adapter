@@ -39,6 +39,11 @@ func (gas *GitHubActionsServer) preparePatchCommentResultMessage(resultResponse 
 		actionsStatus = "Status"
 	}
 	commentMessage := "### GitHub Actions " + actionsStatus + ": "
+	if len(resultResponse.ResultDetails) == 0 {
+		commentMessage += "No workflows found"
+		return commentMessage
+	}
+
 	if resultResponse.Response == app.BrokerResponseInProgress {
 		commentMessage += app.BrokerResponseInProgress
 		commentMessage += " ⏳"
