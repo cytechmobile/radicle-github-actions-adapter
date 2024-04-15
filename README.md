@@ -121,17 +121,12 @@ are exchanges throughout the adapter's runtime:
 ```
 
 If at least on job fails the result will be considered as failed.
+In case of an unexpected a failure response will be replied back to the broker.
 
-In case of an unexpected error the following response message is provided
+### Broker Message Protocol 
 
-```json
-{
-  "response": "finished",
-  "result": {
-    "error": "details of the error occurred"
-  }
-}
-```
+Adapter currently supports Radicle CI Broker message protocol versions:
+> 1
 
 ## Contribute
 

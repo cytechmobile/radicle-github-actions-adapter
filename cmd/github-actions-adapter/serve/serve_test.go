@@ -132,14 +132,6 @@ func (mb *MockBroker) ServeResponse(ctx context.Context, responseMessage broker.
 	return nil
 }
 
-func (mb *MockBroker) ServeErrorResponse(ctx context.Context, responseErrorMessage broker.ResponseErrorMessage) error {
-	eventUUID := ctx.Value(app.EventUUIDKey).(string)
-	if strings.Contains(eventUUID, "invalid") {
-		return errors.New("unknown error")
-	}
-	return nil
-}
-
 type MockGitHubActions struct{}
 
 func (g *MockGitHubActions) GetRepoCommitWorkflowSetup(ctx context.Context, projectID, commitHash string) (*app.GitHubActionsSettings, error) {

@@ -322,7 +322,7 @@ func TestReaderWriterBroker_ServeErrorResponse(t *testing.T) {
 	}
 	type args struct {
 		ctx                  context.Context
-		responseErrorMessage broker.ResponseErrorMessage
+		responseErrorMessage broker.ResponseMessage
 	}
 	tests := []struct {
 		name    string
@@ -339,11 +339,9 @@ func TestReaderWriterBroker_ServeErrorResponse(t *testing.T) {
 			},
 			args: args{
 				ctx: context.TODO(),
-				responseErrorMessage: broker.ResponseErrorMessage{
+				responseErrorMessage: broker.ResponseMessage{
 					Response: "some_response",
-					Result: broker.ErrorMessage{
-						Error: "some error",
-					},
+					Result:   "failure",
 				},
 			},
 			want:    []byte(`{"response":"some_response","result":{"error":"some error"}}`),
@@ -357,11 +355,9 @@ func TestReaderWriterBroker_ServeErrorResponse(t *testing.T) {
 			},
 			args: args{
 				ctx: context.TODO(),
-				responseErrorMessage: broker.ResponseErrorMessage{
+				responseErrorMessage: broker.ResponseMessage{
 					Response: "some_response",
-					Result: broker.ErrorMessage{
-						Error: "",
-					},
+					Result:   "failure",
 				},
 			},
 			want:    []byte(`{"response":"some_response","result":{"error":""}}`),
@@ -375,7 +371,7 @@ func TestReaderWriterBroker_ServeErrorResponse(t *testing.T) {
 				brokerWriter: tt.fields.BrokerWriter,
 				logger:       slog.New(slog.NewJSONHandler(os.Stderr, nil)),
 			}
-			if err := sb.ServeErrorResponse(tt.args.ctx, tt.args.responseErrorMessage); (err != nil) != tt.wantErr {
+			if err := sb.ServeResponse(tt.args.ctx, tt.args.responseErrorMessage); (err != nil) != tt.wantErr {
 				t.Errorf("ServeResponse() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

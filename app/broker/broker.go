@@ -12,8 +12,11 @@ const (
 	RequestMessageTypePatch RequestMessageType = "patch"
 )
 
+var SupportedProtocolVersions = map[uint]bool{1: true}
+
 type RequestTypeMessage struct {
 	Request   string             `json:"request"`
+	Version   uint               `json:"version"`
 	EventType RequestMessageType `json:"event_type"`
 }
 
@@ -125,15 +128,6 @@ type WorkflowArtifact struct {
 	ApiUrl string
 }
 
-type ResponseErrorMessage struct {
-	Response string       `json:"response"`
-	Result   ErrorMessage `json:"result,omitempty"`
-}
-
-type ErrorMessage struct {
-	Error string `json:"error"`
-}
-
 type RunID struct {
 	ID string `json:"id,omitempty"`
 }
@@ -142,5 +136,4 @@ type RunID struct {
 type Broker interface {
 	ParseRequestMessage(ctx context.Context) (*RequestMessage, error)
 	ServeResponse(ctx context.Context, responseMessage ResponseMessage) error
-	ServeErrorResponse(ctx context.Context, responseErrorMessage ResponseErrorMessage) error
 }

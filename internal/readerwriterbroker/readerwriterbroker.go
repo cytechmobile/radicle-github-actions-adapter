@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"radicle-github-actions-adapter/app/broker"
+	"strconv"
 	"strings"
 )
 
@@ -79,6 +80,10 @@ func (sb *ReaderWriterBroker) parseRequestMessageType(input []byte) (broker.Requ
 		sb.logger.Error("not supported message request", "request", brokerMessage.Request)
 		return "", errors.New("not supported message request: " + brokerMessage.Request)
 	}
+	if val, ok := broker.SupportedProtocolVersions[brokerMessage.Version]; !ok || !val {
+		sb.logger.Error("not supported message protocol version", "version", brokerMessage.Version)
+		return "", errors.New("not supported message protocol version: " + strconv.Itoa(int(brokerMessage.Version)))
+	}
 	switch brokerMessage.EventType {
 	case broker.RequestMessageTypePush:
 		return broker.RequestMessageTypePush, nil
@@ -93,11 +98,4 @@ func (sb *ReaderWriterBroker) parseRequestMessageType(input []byte) (broker.Requ
 func (sb *ReaderWriterBroker) ServeResponse(ctx context.Context, responseMessage broker.ResponseMessage) error {
 	encoder := json.NewEncoder(sb.brokerWriter)
 	return encoder.Encode(responseMessage)
-}
-
-// ServeErrorResponse writes the responseErrorMessage to the ReaderWriterBroker.Writer
-func (sb *ReaderWriterBroker) ServeErrorResponse(ctx context.Context,
-	responseErrorMessage broker.ResponseErrorMessage) error {
-	encoder := json.NewEncoder(sb.brokerWriter)
-	return encoder.Encode(responseErrorMessage)
 }

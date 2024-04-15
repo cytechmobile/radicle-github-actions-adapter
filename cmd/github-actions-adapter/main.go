@@ -135,13 +135,11 @@ func run(logger *slog.Logger) error {
 func handleAppError(ctx context.Context, logger *slog.Logger, err error,
 	radicleBroker *readerwriterbroker.ReaderWriterBroker) error {
 	logger.Error("could not serve radicle gitHub actions", "error", err.Error())
-	resultErrorResponse := broker.ResponseErrorMessage{
+	resultErrorResponse := broker.ResponseMessage{
 		Response: app.BrokerResponseFinished,
-		Result: broker.ErrorMessage{
-			Error: err.Error(),
-		},
+		Result:   app.BrokerResultFailure,
 	}
-	err = radicleBroker.ServeErrorResponse(ctx, resultErrorResponse)
+	err = radicleBroker.ServeResponse(ctx, resultErrorResponse)
 	if err != nil {
 		logger.Error("could not respond to broker", "error", err.Error())
 		return err
