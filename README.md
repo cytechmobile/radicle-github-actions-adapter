@@ -121,7 +121,7 @@ are exchanges throughout the adapter's runtime:
 ```
 
 If at least on job fails the result will be considered as failed.
-In case of an unexpected a failure response will be replied back to the broker.
+In case of an unexpected error a failure response will be replied back to the broker.
 
 ### Broker Message Protocol 
 
