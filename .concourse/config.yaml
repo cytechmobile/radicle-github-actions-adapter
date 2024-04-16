@@ -1,5 +1,5 @@
 ---
-resources:
+#resources:
 
   # Where we will push the binaries
 #  - name: bucket
@@ -12,9 +12,9 @@ resources:
 #      endpoint: minio-api.radicle.gr
 
 jobs:
-  -
+  
   # test-source for errors
-  - name: test-source
+  - name: test-release
     plan:
       - task: test
         config:
