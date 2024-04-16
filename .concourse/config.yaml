@@ -12,7 +12,7 @@
 #      endpoint: minio-api.radicle.gr
 
 jobs:
-  
+
   # test-source for errors
   - name: test-release
     plan:
@@ -54,6 +54,7 @@ jobs:
             args:
               - -c
               - |
+                cd github-actions-adapter
                 ls -al
                 COMMIT_HASH=$(git rev-parse HEAD)
                 VERSION="test"
