@@ -3,7 +3,6 @@ package serve
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"os"
 	"radicle-github-actions-adapter/app"
@@ -208,7 +207,6 @@ func (p *MockRadiclePatch) Comment(ctx context.Context, repoID, patchID, revisio
 		p.t.Error("too much comments requested in total")
 		return errors.New("too much comments requested in total")
 	}
-	fmt.Println(p.TotalComments)
 	return nil
 }
 
