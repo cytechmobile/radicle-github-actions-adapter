@@ -50,7 +50,7 @@ jobs:
           run:
             path: sh
             args:
-              - -c
+              - -ec
               - |
                 cd github-actions-adapter
                 make build
@@ -73,11 +73,11 @@ jobs:
           run:
             path: sh
             args:
-              - -c
+              - -ec
               - |
+                cd github-actions-adapter
                 # if `version` file has changed
                 if git diff --name-only HEAD^ HEAD | grep -q "^version$"; then
-                  cd github-actions-adapter-release
                   COMMIT_HASH=$(git rev-parse HEAD)
                   VERSION=$(head -n 1 version)
                   echo Releasing version: $VERSION
