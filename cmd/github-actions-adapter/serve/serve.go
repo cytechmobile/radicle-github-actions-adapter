@@ -72,7 +72,7 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	if err != nil {
 		//In case of an error append to the comment patch
 		if brokerRequestMessage.PatchEvent != nil {
-			commentMessage := "### Could bot check GitHub Action Workflows."
+			commentMessage := "Could bot check GitHub Action Workflows."
 			commentMessage += "\n  <details><summary>Error Details</summary>" + err.Error() + "</details>"
 			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage, true)
 		}
@@ -101,13 +101,13 @@ func (gas *GitHubActionsServer) checkGitHubWorkflows(ctx context.Context, broker
 	}
 	if repoCommitWorkflowSetup == nil {
 		if brokerRequestMessage.PatchEvent != nil {
-			commentMessage := "### No GiHub Actions Workflows found."
+			commentMessage := "No GiHub Actions Workflows found."
 			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage, false)
 		}
 	} else {
 		// Write 1st comment that we check GitHub for workflows
 		if brokerRequestMessage.PatchEvent != nil {
-			commentMessage := "### Checking for GitHub Actions Workflows..."
+			commentMessage := "Checking for GitHub Actions Workflows..."
 			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage, false)
 		}
 		time.Sleep(time.Second * time.Duration(gas.App.Config.WorkflowsStartLagSecs))

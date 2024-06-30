@@ -3,6 +3,12 @@
 All notable changes for every released version of this project will be documented in this file.  
 Check [Changelog Format](#Changelog-Format) for more details about this changelog's format.
 
+## Unreleased
+
+### Changed
+
+- Improve comments' content
+
 ## [v0.6.0] - 2024-04-26
 
 ### Added
