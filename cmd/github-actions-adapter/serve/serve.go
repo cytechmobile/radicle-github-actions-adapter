@@ -72,8 +72,8 @@ func (gas *GitHubActionsServer) Serve(ctx context.Context) error {
 	if err != nil {
 		//In case of an error append to the comment patch
 		if brokerRequestMessage.PatchEvent != nil {
-			commentMessage := "Could bot check GitHub Action Workflows."
-			commentMessage += "\n  <details><summary>Error Details</summary>" + err.Error() + "</details>"
+			commentMessage := "Could not check GitHub Action Workflows."
+			commentMessage += "\n  *Error Details: " + err.Error() + "*"
 			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage, true)
 		}
 		return err
