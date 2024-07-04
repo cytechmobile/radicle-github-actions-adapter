@@ -8,6 +8,7 @@ Check [Changelog Format](#Changelog-Format) for more details about this changelo
 ### Changed
 
 - Improve comments' content
+- Removed unnecessary patch comment
 
 ## [v0.6.0] - 2024-04-26
 

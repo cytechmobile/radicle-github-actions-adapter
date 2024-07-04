@@ -99,12 +99,7 @@ func (gas *GitHubActionsServer) checkGitHubWorkflows(ctx context.Context, broker
 		Response: app.BrokerResponseFinished,
 		Result:   app.BrokerResultSuccess,
 	}
-	if repoCommitWorkflowSetup == nil {
-		if brokerRequestMessage.PatchEvent != nil {
-			commentMessage := "No GiHub Actions Workflows found."
-			_ = gas.commentOnPatch(ctx, brokerRequestMessage, commentMessage, false)
-		}
-	} else {
+	if repoCommitWorkflowSetup != nil {
 		// Write 1st comment that we check GitHub for workflows
 		if brokerRequestMessage.PatchEvent != nil {
 			commentMessage := "Checking for GitHub Actions Workflows..."
