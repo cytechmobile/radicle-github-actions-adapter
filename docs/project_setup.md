@@ -110,7 +110,7 @@ git push both new-feature-x
 * Open the path at Radicle and wait for the workflows' results to appear
 
 ```bash
-git push rad -o patch.message="Implemented feature X" HEAD:refs/patches
+git push both -o patch.message="Implemented feature X" HEAD:refs/patches
 ```
 
 If everything is set up correctly, a comment will ba added to the patch providing information for the progress and the 
